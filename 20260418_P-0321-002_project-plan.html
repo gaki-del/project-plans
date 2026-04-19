@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Plan — Viaduct Governance Regulations (P-0321-002)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FAFAFA; --surface:#FFFFFF; --surface-2:#F5F5F5;
+  --border:#E8E8E8; --border-strong:#D4D4D4;
+  --text:#1A1A1A; --text-muted:#6B6B6B; --text-subtle:#9A9A9A;
+  --primary:#393939; --accent:#4A90D9;
+  --done:#2EAE5F; --inprog:#4A90D9; --todo:#9A9A9A; --blocked:#E46962;
+  --critical:#E46962; --milestone:#F5A623;
+  --risk-h:#E46962; --risk-m:#F5A623; --risk-l:#2EDF75;
+  --avoid:#C94A43; --mitigate:#E8A73C; --transfer:#4A90D9; --accept:#6B6B6B;
+  --estimated:#FFF8E1; --estimated-border:#F5D76E;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 2px 8px rgba(0,0,0,0.06);
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'IBM Plex Sans','IBM Plex Sans JP',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.container{max-width:1280px;margin:0 auto;padding:32px 28px 64px}
+
+body[data-lang="ja"] .en,body[data-lang="en"] .ja{display:none}
+.lang-switch{position:fixed;top:16px;right:20px;z-index:100;display:flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px;box-shadow:var(--shadow-sm);font-size:11px;font-weight:500}
+.lang-switch button{background:transparent;border:none;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--text-muted);font-family:inherit;font-weight:500;letter-spacing:.04em;transition:all .15s ease}
+.lang-switch button.active{background:var(--primary);color:#fff}
+
+header.hero{margin-bottom:24px}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:8px}
+h1.title{font-size:28px;font-weight:600;letter-spacing:-0.01em;color:var(--primary);margin-bottom:6px}
+.subtitle{font-size:15px;color:var(--text-muted)}
+.meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.meta-item{font-size:12px;color:var(--text-muted)}
+.meta-item strong{color:var(--text);font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.badge-mode{background:var(--primary);color:#fff}
+.badge-t2{background:var(--accent);color:#fff}
+.badge-ok{background:rgba(46,174,95,0.12);color:var(--done)}
+.badge-warn{background:rgba(245,166,35,0.18);color:#8A6D1A}
+.badge-stop{background:rgba(201,74,67,0.12);color:var(--avoid)}
+.badge-est{background:var(--estimated);color:#8A6D1A;border:1px solid var(--estimated-border)}
+
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:transparent;border:none;padding:12px 18px;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s ease;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-subtle);font-weight:400}
+.tab-btn.active .tab-num{color:var(--primary)}
+
+.panel{display:none;animation:fade .3s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.section-h{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:12px;margin-top:24px}
+.section-h:first-child{margin-top:0}
+.panel-title{font-size:20px;font-weight:600;color:var(--primary);margin-bottom:4px;letter-spacing:-0.01em}
+.panel-desc{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--primary)}
+.card-body{font-size:13px;color:var(--text-muted)}
+
+/* Charter */
+.charter-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+.charter-table tr td{padding:14px 16px;border-top:1px solid var(--border);font-size:13px;vertical-align:top}
+.charter-table tr:first-child td{border-top:none}
+.charter-table td.key{width:26%;background:var(--surface-2);font-weight:500;color:var(--text);font-size:12px;letter-spacing:.02em}
+.charter-table td.val{color:var(--text-muted);line-height:1.65}
+.charter-table td.val strong{color:var(--text);font-weight:500}
+
+.priority-triangle{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.pt-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;font-size:12px}
+.pt-cell .pt-label{font-size:10px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.pt-cell .pt-val{font-weight:600;color:var(--primary);font-size:13px}
+.pt-fixed{background:rgba(228,105,98,0.08);border-color:var(--critical)}
+.pt-fixed .pt-val{color:var(--critical)}
+.pt-flexible{background:rgba(74,144,217,0.08);border-color:var(--accent)}
+.pt-flexible .pt-val{color:var(--accent)}
+.pt-accept{background:rgba(154,154,154,0.08)}
+
+/* WBS tree */
+.wbs-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);font-size:13px}
+.wbs-table thead th{background:var(--primary);color:#fff;font-weight:500;font-size:12px;padding:12px 14px;text-align:left;letter-spacing:.02em}
+.wbs-table tbody td{padding:11px 14px;border-top:1px solid var(--border);vertical-align:top}
+.wbs-l1 td{background:#F0F0F0;font-weight:600;color:var(--primary);font-size:12px;letter-spacing:.03em;text-transform:uppercase}
+.wbs-l2 td{background:var(--surface);font-weight:500;color:var(--text)}
+.wbs-l2 td.wbs-code{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500}
+.wbs-l3 td{color:var(--text-muted);font-size:12.5px}
+.wbs-l3 td.wbs-code{color:var(--text-subtle);font-family:'IBM Plex Mono',monospace;font-size:11px;padding-left:28px}
+.wbs-status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.status-done{background:rgba(46,174,95,0.15);color:var(--done)}
+.status-inprog{background:rgba(74,144,217,0.15);color:var(--inprog)}
+.status-todo{background:var(--surface-2);color:var(--text-muted)}
+.status-blocked{background:rgba(228,105,98,0.12);color:var(--blocked)}
+.wbs-table .col-narrow{width:80px}
+.wbs-table .col-medium{width:120px}
+.wbs-table .col-owner{width:130px;color:var(--text);font-weight:500}
+
+/* Gantt */
+.gantt-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;overflow-x:auto}
+.gantt-legend{display:flex;gap:18px;margin-bottom:16px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
+.gantt-legend-item{display:flex;align-items:center;gap:6px}
+.gantt-swatch{width:14px;height:10px;border-radius:2px;display:inline-block}
+
+/* RACI */
+.raci-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.raci-table th,.raci-table td{padding:10px 12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
+.raci-table th{background:var(--surface-2);font-weight:500;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.raci-table td.task-cell{text-align:left;font-weight:500;color:var(--text);background:var(--surface)}
+.raci-table td.raci-cell{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.raci-r{background:rgba(74,144,217,0.12);color:var(--accent)}
+.raci-a{background:rgba(245,166,35,0.15);color:#8A6D1A}
+.raci-c{background:rgba(154,154,154,0.10);color:var(--text-muted)}
+.raci-i{background:rgba(46,174,95,0.08);color:var(--done)}
+
+/* Risk */
+.risk-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.risk-table th,.risk-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.risk-table th{background:var(--surface-2);font-weight:500;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.risk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.strat-pill{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.strat-avoid{background:rgba(201,74,67,0.15);color:var(--avoid)}
+.strat-mitigate{background:rgba(232,167,60,0.18);color:#8A6D1A}
+.strat-transfer{background:rgba(74,144,217,0.15);color:var(--accent)}
+.strat-accept{background:rgba(154,154,154,0.15);color:var(--text-muted)}
+
+.risk-heatmap{display:grid;grid-template-columns:60px repeat(3,1fr);grid-template-rows:30px repeat(3,90px);gap:2px;margin-top:16px;max-width:500px}
+.heat-head{background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.heat-cell{background:var(--surface);border:1px solid var(--border);padding:6px;font-size:10px;position:relative;color:var(--text-muted)}
+.heat-hh,.heat-hm,.heat-mh{background:rgba(228,105,98,0.22)}
+.heat-hl,.heat-ml,.heat-mm{background:rgba(245,166,35,0.22)}
+.heat-lh,.heat-lm,.heat-ll{background:rgba(46,223,117,0.18)}
+.heat-cell .chip{display:inline-block;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;color:var(--text);margin:2px 2px 0 0;font-family:'IBM Plex Mono',monospace}
+
+/* Dashboard */
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:500}
+.kpi-value{font-size:28px;font-weight:600;color:var(--primary);letter-spacing:-0.01em;font-family:'IBM Plex Sans',sans-serif}
+.kpi-sub{font-size:12px;color:var(--text-muted);margin-top:6px}
+.progress-track{background:var(--surface-2);height:8px;border-radius:4px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent) 0%,var(--done) 100%);border-radius:4px}
+.milestone-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.ms-row{display:grid;grid-template-columns:70px 1fr 100px 90px;padding:12px 16px;border-top:1px solid var(--border);font-size:13px;align-items:center}
+.ms-row:first-child{border-top:none}
+.ms-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-subtle)}
+.ms-name{color:var(--text);font-weight:500}
+.ms-owner{font-size:12px;color:var(--text-muted)}
+
+footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:11px;color:var(--text-subtle);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:10px}
+
+@media print{
+  body{background:#fff}
+  .lang-switch,nav.tabs{display:none}
+  .panel{display:block!important;page-break-before:always}
+  .panel:first-of-type{page-break-before:auto}
+  footer{display:none}
+}
+@media (max-width:860px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .priority-triangle{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body data-lang="ja">
+
+<div class="lang-switch" role="group" aria-label="Language">
+  <button type="button" data-set-lang="ja" class="active">日本語</button>
+  <button type="button" data-set-lang="en">English</button>
+</div>
+
+<div class="container">
+
+<header class="hero">
+  <div class="eyebrow">Skill9 · Project &amp; Task Engine · T2 Project</div>
+  <h1 class="title">Viaduct Governance Regulations</h1>
+  <div class="subtitle"><span class="ja">Viaduct 規定整備プロジェクト — 40規程のドラフト作成・フォーマット適用・承認取得</span><span class="en">Viaduct regulations project — draft, format, and secure approval for 40 corporate rules</span></div>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Project ID</strong> P-0321-002</div>
+    <div class="meta-item"><strong><span class="ja">開始</span><span class="en">Start</span></strong> 2026-03-21</div>
+    <div class="meta-item"><strong><span class="ja">目標完了</span><span class="en">Target</span></strong> 2026-05-31</div>
+    <div class="meta-item"><strong><span class="ja">スポンサー</span><span class="en">Sponsor</span></strong> David (CEO)</div>
+    <div class="meta-item"><strong><span class="ja">PM</span><span class="en">PM</span></strong> <span class="ja">新垣</span><span class="en">Aragaki</span></div>
+    <div class="meta-item"><span class="badge badge-t2">T2 PROJECT</span></div>
+    <div class="meta-item"><span class="badge badge-mode">PREDICTIVE</span></div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" data-tab="0"><span class="tab-num">01</span>Charter</button>
+  <button class="tab-btn" data-tab="1"><span class="tab-num">02</span>WBS</button>
+  <button class="tab-btn" data-tab="2"><span class="tab-num">03</span>Schedule</button>
+  <button class="tab-btn" data-tab="3"><span class="tab-num">04</span>RACI</button>
+  <button class="tab-btn" data-tab="4"><span class="tab-num">05</span>Risk</button>
+  <button class="tab-btn" data-tab="5"><span class="tab-num">06</span>Dashboard</button>
+</nav>
+
+<!-- TAB 0: Charter -->
+<section class="panel active" data-panel="0">
+  <div class="panel-title">Project Charter</div>
+  <div class="panel-desc"><span class="ja">プロジェクト憲章。PMP T2 12章構成に準拠。目的・スコープ・成功基準・制約条件を定義。</span><span class="en">Project charter per PMP T2 12-chapter standard. Defines purpose, scope, success criteria, and constraints.</span></div>
+
+  <table class="charter-table">
+    <tr><td class="key"><span class="ja">目的と背景</span><span class="en">Purpose &amp; Background</span></td>
+      <td class="val"><span class="ja">Viaduct AI は設立からの急成長に伴い社内規程が未整備。<strong>KPMG監査対応・SRIガバナンス基準準拠・取締役会承認基盤の整備</strong>が不可欠となっている。40規程を対象にSRI既存規程をベースにViaduct向けにカスタマイズ、Google Doc標準フォーマットを適用、取締役会承認を経て正式運用に移行する。</span><span class="en">Viaduct AI lacks formal internal rules despite rapid growth since founding. <strong>KPMG audit, SRI governance alignment, and Board approval foundation</strong> are essential. Customize 40 SRI rules for Viaduct, apply standard Google Doc formatting, secure Board approval, and roll into production governance.</span></td></tr>
+    <tr><td class="key"><span class="ja">対象範囲</span><span class="en">In Scope</span></td>
+      <td class="val"><span class="ja">・40規程のドラフト作成（◎15規程の必須 + 〇20規程の優先 + No.11附表1含む）<br>・SRIフォーマット適用（GAS Web App `formatRegulation()` 実行）<br>・社内レビュー・コメント反映・取締役会承認<br>・Overview SS（VIA-BR-001）上での進捗トラッキング</span><span class="en">・Drafting of 40 regulations (15 must-have in ◎ + 20 priority in 〇 + No.11 Attachment 1)<br>・SRI format application (GAS Web App `formatRegulation()`)<br>・Internal review, comment resolution, Board approval<br>・Progress tracking on Overview SS (VIA-BR-001)</span></td></tr>
+    <tr><td class="key"><span class="ja">対象外</span><span class="en">Out of Scope</span></td>
+      <td class="val"><span class="ja">・No.63/64（タイヤ事業関連）— Viaduct事業範囲外<br>・運用教育・社内周知会 — 別プロジェクトで対応<br>・英訳版作成 — Phase 2以降で検討</span><span class="en">・No.63/64 (tire business) — outside Viaduct scope<br>・Training &amp; internal rollout — separate project<br>・English translations — considered in Phase 2</span></td></tr>
+    <tr><td class="key"><span class="ja">成功基準</span><span class="en">Success Criteria</span></td>
+      <td class="val"><span class="ja">(1) 40規程のドラフト完了率 100%（現状 34/40 = 85%）<br>(2) SRIフォーマット適用率 100%<br>(3) 取締役会での承認取得<br>(4) KPMG監査で内部統制 Walkthrough 実施可能</span><span class="en">(1) Drafting completion 100% (currently 34/40 = 85%)<br>(2) Format application rate 100%<br>(3) Board approval secured<br>(4) KPMG internal-control walkthrough ready</span></td></tr>
+    <tr><td class="key"><span class="ja">主要成果物</span><span class="en">Key Deliverables</span></td>
+      <td class="val"><span class="ja">・規程ドラフト Google Doc × 40件<br>・Overview SS（ID: 1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA）<br>・WS4監査準備 Doc<br>・No.11附表1（権限別一覧表）</span><span class="en">・Regulation drafts × 40 Google Docs<br>・Overview SS (ID: 1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA)<br>・WS4 audit preparation Doc<br>・No.11 Attachment 1 (authority matrix)</span></td></tr>
+    <tr><td class="key"><span class="ja">予算</span><span class="en">Budget</span></td>
+      <td class="val"><span class="ja">人件費のみ。PM 40%稼働 × 2.5ヶ月、サポート 20%稼働。<br>外部費用: GAS実行 (無料枠内) / KPMG監査費用は別予算</span><span class="en">Labor only. PM 40% allocation × 2.5 months, support 20%.<br>External: GAS (free tier) / KPMG audit fees on separate budget</span></td></tr>
+    <tr><td class="key"><span class="ja">制約条件 — Priority Triangle</span><span class="en">Constraints — Priority Triangle</span></td>
+      <td class="val">
+        <div class="priority-triangle">
+          <div class="pt-cell pt-fixed"><div class="pt-label">Scope</div><div class="pt-val"><span class="ja">固定</span><span class="en">Fixed</span></div></div>
+          <div class="pt-cell pt-fixed"><div class="pt-label">Time</div><div class="pt-val"><span class="ja">固定</span><span class="en">Fixed</span></div></div>
+          <div class="pt-cell pt-flexible"><div class="pt-label">Cost</div><div class="pt-val"><span class="ja">柔軟</span><span class="en">Flexible</span></div></div>
+          <div class="pt-cell pt-accept"><div class="pt-label">Quality</div><div class="pt-val"><span class="ja">受容</span><span class="en">Accept</span></div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text-muted)"><span class="ja">40規程全部が必要（KPMG要求）。期限も動かせない（Q2監査準備）。コストは柔軟（人的リソース追加可）。品質は最低ラインを死守。</span><span class="en">All 40 rules required (KPMG demand). Deadline hard (Q2 audit prep). Cost flexible (resources can flex). Quality must clear minimum bar.</span></div>
+      </td></tr>
+    <tr><td class="key"><span class="ja">Approach</span><span class="en">Approach</span></td>
+      <td class="val"><span class="ja"><strong>Predictive（予測型）</strong>。成果物（40規程）と完了条件が事前確定、SRI既存規程という過去実績あり、依存関係が固定（ドラフト→フォーマット→レビュー→承認）のため。</span><span class="en"><strong>Predictive</strong>. Deliverables (40 rules) and acceptance criteria are fixed; SRI provides baseline; dependencies sequential (draft → format → review → approve).</span></td></tr>
+  </table>
+</section>
+
+<!-- TAB 1: WBS -->
+<section class="panel" data-panel="1">
+  <div class="panel-title">Work Breakdown Structure</div>
+  <div class="panel-desc"><span class="ja">Level 1 ワークストリーム（3本）→ Level 2 ワークパッケージ（8本）→ Level 3 主要タスク。クリティカルパスは WS1→WS2→WS3 で直列。</span><span class="en">Level 1 workstreams (×3) → Level 2 work packages (×8) → Level 3 key tasks. Critical path is serial: WS1 → WS2 → WS3.</span></div>
+  <table class="wbs-table">
+    <thead>
+      <tr><th style="width:14%">Code</th><th>Work Package</th><th class="col-medium"><span class="ja">期限</span><span class="en">Due</span></th><th class="col-owner"><span class="ja">担当</span><span class="en">Owner</span></th><th class="col-narrow">Status</th></tr>
+    </thead>
+    <tbody>
+      <tr class="wbs-l1"><td>WS1</td><td colspan="4"><span class="ja">ドラフト作成</span><span class="en">Drafting</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">1.1</td><td><span class="ja">◎ 必須規程15件ドラフト</span><span class="en">Must-have regulations (15) draft</span></td><td>2026-04-10</td><td class="col-owner"><span class="ja">新垣</span><span class="en">Aragaki</span></td><td><span class="wbs-status status-done">Done</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">1.1.1</td><td><span class="ja">SRI原本取り込み・差分分析</span><span class="en">Import SRI originals, diff analysis</span></td><td>2026-03-28</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-done">Done</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">1.1.2</td><td><span class="ja">Viaductカスタマイズ（会社名・役職・金額基準）</span><span class="en">Viaduct customization (name, roles, thresholds)</span></td><td>2026-04-10</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-done">Done</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">1.2</td><td><span class="ja">〇 優先規程20件ドラフト</span><span class="en">Priority regulations (20) draft</span></td><td>2026-04-25</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-inprog">In Prog</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">1.2.1</td><td><span class="ja">19件完了（34件中 15+19）</span><span class="en">19 completed (15+19 out of 34 total)</span></td><td>2026-04-18</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-done">Done</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">1.2.2</td><td><span class="ja">残6件ドラフト（40 − 34）</span><span class="en">Remaining 6 drafts (40 − 34)</span></td><td>2026-04-25</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-inprog">In Prog</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">1.3</td><td><span class="ja">No.11附表1（権限別一覧表）</span><span class="en">No.11 Attachment 1 (authority matrix)</span></td><td>2026-04-22</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-blocked">Blocked</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">1.3.1</td><td><span class="ja">権限閾値のCEO決裁取得</span><span class="en">Secure CEO decision on authority thresholds</span></td><td>2026-04-22</td><td class="col-owner">David</td><td><span class="wbs-status status-blocked">Blocked</span></td></tr>
+
+      <tr class="wbs-l1"><td>WS2</td><td colspan="4"><span class="ja">フォーマット適用</span><span class="en">Format Application</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">2.1</td><td><span class="ja">GAS Web App `formatRegulation()` 実行</span><span class="en">Run GAS Web App `formatRegulation()`</span></td><td>2026-05-02</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-inprog">In Prog</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">2.1.1</td><td><span class="ja">20件適用済</span><span class="en">20 already applied</span></td><td>2026-04-18</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-done">Done</span></td></tr>
+      <tr class="wbs-l3"><td class="wbs-code">2.1.2</td><td><span class="ja">残20件（◎5+〇15 推定）</span><span class="en">Remaining 20 (5 ◎ + 15 〇 estimated)</span><span class="badge badge-est">Est</span></td><td>2026-05-02</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-todo">To Do</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">2.2</td><td><span class="ja">QA チェックリスト適用</span><span class="en">QA checklist application</span></td><td>2026-05-06</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-todo">To Do</span></td></tr>
+
+      <tr class="wbs-l1"><td>WS3</td><td colspan="4"><span class="ja">レビュー・承認</span><span class="en">Review &amp; Approval</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">3.1</td><td><span class="ja">Shige（Viaduct CFO）レビュー</span><span class="en">Shige (Viaduct CFO) review</span></td><td>2026-05-15</td><td class="col-owner">Shigematsu</td><td><span class="wbs-status status-todo">To Do</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">3.2</td><td><span class="ja">KPMG事前コメント反映</span><span class="en">KPMG pre-review comments</span></td><td>2026-05-22</td><td class="col-owner">Aragaki</td><td><span class="wbs-status status-todo">To Do</span></td></tr>
+      <tr class="wbs-l2"><td class="wbs-code">3.3</td><td><span class="ja">取締役会承認</span><span class="en">Board approval</span></td><td>2026-05-31</td><td class="col-owner">David</td><td><span class="wbs-status status-todo">To Do</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- TAB 2: Schedule / Gantt -->
+<section class="panel" data-panel="2">
+  <div class="panel-title">Schedule &amp; Critical Path</div>
+  <div class="panel-desc"><span class="ja">Mar 21 〜 May 31 の10週間。赤線＝クリティカルパス（WS1.2 → WS1.3 → WS2.1 → WS3.1 → WS3.3）。◆＝マイルストーン。</span><span class="en">Mar 21 – May 31 (10 weeks). Red bars = critical path (WS1.2 → WS1.3 → WS2.1 → WS3.1 → WS3.3). ◆ = milestones.</span></div>
+
+  <div class="gantt-legend">
+    <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--done)"></span><span class="ja">完了</span><span class="en">Done</span></div>
+    <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--inprog)"></span><span class="ja">進行中</span><span class="en">In Progress</span></div>
+    <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--todo)"></span><span class="ja">未着手</span><span class="en">To Do</span></div>
+    <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--blocked)"></span><span class="ja">ブロック</span><span class="en">Blocked</span></div>
+    <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--critical);border:1px dashed var(--critical)"></span><span class="ja">クリティカル境界</span><span class="en">Critical Path</span></div>
+    <div class="gantt-legend-item">◆ <span class="ja">マイルストーン</span><span class="en">Milestone</span></div>
+  </div>
+
+  <div class="gantt-wrap">
+    <svg viewBox="0 0 1100 480" style="width:100%;height:auto;min-width:780px" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans','IBM Plex Sans JP',sans-serif">
+      <!-- Week grid -->
+      <g font-size="10" fill="#9A9A9A">
+        <text x="200" y="24">Mar 21</text>
+        <text x="290" y="24">Mar 28</text>
+        <text x="380" y="24">Apr 04</text>
+        <text x="470" y="24">Apr 11</text>
+        <text x="560" y="24">Apr 18</text>
+        <text x="650" y="24">Apr 25</text>
+        <text x="740" y="24">May 02</text>
+        <text x="830" y="24">May 09</text>
+        <text x="920" y="24">May 16</text>
+        <text x="1010" y="24">May 23</text>
+      </g>
+      <!-- Today line (Apr 18) -->
+      <g>
+        <line x1="560" y1="30" x2="560" y2="460" stroke="#E46962" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="564" y="42" font-size="10" fill="#E46962" font-weight="600">TODAY 04/18</text>
+      </g>
+      <!-- Grid verticals -->
+      <g stroke="#E8E8E8" stroke-width="0.5">
+        <line x1="200" y1="40" x2="200" y2="460"/>
+        <line x1="290" y1="40" x2="290" y2="460"/>
+        <line x1="380" y1="40" x2="380" y2="460"/>
+        <line x1="470" y1="40" x2="470" y2="460"/>
+        <line x1="650" y1="40" x2="650" y2="460"/>
+        <line x1="740" y1="40" x2="740" y2="460"/>
+        <line x1="830" y1="40" x2="830" y2="460"/>
+        <line x1="920" y1="40" x2="920" y2="460"/>
+        <line x1="1010" y1="40" x2="1010" y2="460"/>
+        <line x1="1100" y1="40" x2="1100" y2="460"/>
+      </g>
+
+      <!-- Rows -->
+      <!-- Row WS1.1 -->
+      <g>
+        <text x="10" y="72" font-size="11" fill="#1A1A1A" font-weight="500">1.1 Must-have ×15</text>
+        <rect x="200" y="62" width="270" height="18" rx="3" fill="#2EAE5F"/>
+        <text x="210" y="75" font-size="10" fill="#fff" font-weight="500">DONE</text>
+      </g>
+      <!-- Row WS1.2 -->
+      <g>
+        <text x="10" y="104" font-size="11" fill="#1A1A1A" font-weight="500">1.2 Priority ×20 <tspan fill="#E46962" font-weight="600">●</tspan></text>
+        <rect x="290" y="94" width="360" height="18" rx="3" fill="#4A90D9"/>
+        <text x="300" y="107" font-size="10" fill="#fff" font-weight="500">IN PROG · 19/20 (95%)</text>
+      </g>
+      <!-- Row WS1.3 -->
+      <g>
+        <text x="10" y="136" font-size="11" fill="#1A1A1A" font-weight="500">1.3 No.11 Att.1 <tspan fill="#E46962" font-weight="600">●</tspan></text>
+        <rect x="470" y="126" width="180" height="18" rx="3" fill="#E46962"/>
+        <text x="478" y="139" font-size="10" fill="#fff" font-weight="500">BLOCKED · CEO decision pending</text>
+      </g>
+      <!-- Milestone M1: Drafts Complete -->
+      <g transform="translate(650,140)">
+        <polygon points="0,-10 10,0 0,10 -10,0" fill="#F5A623"/>
+        <text x="0" y="28" text-anchor="middle" font-size="9" fill="#8A6D1A" font-weight="600">M1</text>
+      </g>
+
+      <!-- Row WS2.1 -->
+      <g>
+        <text x="10" y="178" font-size="11" fill="#1A1A1A" font-weight="500">2.1 Format apply <tspan fill="#E46962" font-weight="600">●</tspan></text>
+        <rect x="470" y="168" width="270" height="18" rx="3" fill="url(#splitFill)"/>
+        <text x="478" y="181" font-size="10" fill="#fff" font-weight="500">20 of 40 done</text>
+      </g>
+      <defs>
+        <linearGradient id="splitFill" x1="0" x2="1">
+          <stop offset="0" stop-color="#4A90D9"/>
+          <stop offset="0.33" stop-color="#4A90D9"/>
+          <stop offset="0.34" stop-color="#9A9A9A"/>
+          <stop offset="1" stop-color="#9A9A9A"/>
+        </linearGradient>
+      </defs>
+      <!-- Row WS2.2 -->
+      <g>
+        <text x="10" y="210" font-size="11" fill="#1A1A1A" font-weight="500">2.2 QA checklist</text>
+        <rect x="700" y="200" width="90" height="18" rx="3" fill="#9A9A9A"/>
+      </g>
+      <!-- Milestone M2: Format Complete -->
+      <g transform="translate(740,214)">
+        <polygon points="0,-10 10,0 0,10 -10,0" fill="#F5A623"/>
+        <text x="0" y="28" text-anchor="middle" font-size="9" fill="#8A6D1A" font-weight="600">M2</text>
+      </g>
+
+      <!-- Row WS3.1 -->
+      <g>
+        <text x="10" y="252" font-size="11" fill="#1A1A1A" font-weight="500">3.1 Shige review <tspan fill="#E46962" font-weight="600">●</tspan></text>
+        <rect x="740" y="242" width="180" height="18" rx="3" fill="#9A9A9A"/>
+      </g>
+      <!-- Row WS3.2 -->
+      <g>
+        <text x="10" y="284" font-size="11" fill="#1A1A1A" font-weight="500">3.2 KPMG comments</text>
+        <rect x="830" y="274" width="90" height="18" rx="3" fill="#9A9A9A"/>
+      </g>
+      <!-- Row WS3.3 -->
+      <g>
+        <text x="10" y="316" font-size="11" fill="#1A1A1A" font-weight="500">3.3 Board approval <tspan fill="#E46962" font-weight="600">●</tspan></text>
+        <rect x="920" y="306" width="90" height="18" rx="3" fill="#9A9A9A"/>
+      </g>
+      <!-- Milestone M3: Board Approved -->
+      <g transform="translate(1010,320)">
+        <polygon points="0,-10 10,0 0,10 -10,0" fill="#F5A623"/>
+        <text x="-5" y="28" text-anchor="end" font-size="9" fill="#8A6D1A" font-weight="600">M3 · Final</text>
+      </g>
+
+      <!-- Critical path line overlay -->
+      <g stroke="#E46962" stroke-width="1.5" fill="none" stroke-dasharray="3 2">
+        <path d="M290,103 L650,103 L650,135 L650,177 L740,177 L740,251 L920,251 L920,315 L1010,315"/>
+      </g>
+
+      <!-- Legend for priority markers -->
+      <g transform="translate(10,400)">
+        <text x="0" y="0" font-size="10" fill="#9A9A9A">● = <tspan fill="#E46962">critical path task</tspan></text>
+        <text x="0" y="18" font-size="10" fill="#9A9A9A">M1 Drafts complete · 2026-04-25 / M2 Format complete · 2026-05-06 / M3 Board approved · 2026-05-31</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="section-h"><span class="ja">マイルストーン詳細</span><span class="en">Milestone detail</span></div>
+  <div class="milestone-list">
+    <div class="ms-row"><div class="ms-date">2026-04-25</div><div class="ms-name">M1 · <span class="ja">全40規程ドラフト完了</span><span class="en">All 40 drafts complete</span></div><div class="ms-owner">Aragaki</div><div><span class="wbs-status status-inprog">In Prog</span></div></div>
+    <div class="ms-row"><div class="ms-date">2026-05-06</div><div class="ms-name">M2 · <span class="ja">フォーマット適用・QA完了</span><span class="en">Format &amp; QA complete</span></div><div class="ms-owner">Aragaki</div><div><span class="wbs-status status-todo">To Do</span></div></div>
+    <div class="ms-row"><div class="ms-date">2026-05-15</div><div class="ms-name">M2.5 · <span class="ja">Shige / KPMG レビュー完了</span><span class="en">Shige / KPMG review complete</span></div><div class="ms-owner">Shigematsu</div><div><span class="wbs-status status-todo">To Do</span></div></div>
+    <div class="ms-row"><div class="ms-date">2026-05-31</div><div class="ms-name">M3 · <span class="ja">取締役会承認・正式運用開始</span><span class="en">Board approved &amp; live</span></div><div class="ms-owner">David</div><div><span class="wbs-status status-todo">To Do</span></div></div>
+  </div>
+</section>
+
+<!-- TAB 3: RACI -->
+<section class="panel" data-panel="3">
+  <div class="panel-title">RACI Matrix</div>
+  <div class="panel-desc"><span class="ja">主要ワークパッケージ × ステークホルダー。R=実行、A=承認、C=相談、I=報告。A は各行1名のみ（PMP原則）。</span><span class="en">Work packages × stakeholders. R=Responsible, A=Accountable, C=Consulted, I=Informed. Only one A per row (PMP principle).</span></div>
+
+  <table class="raci-table">
+    <thead>
+      <tr>
+        <th style="text-align:left;width:36%"><span class="ja">作業項目</span><span class="en">Work Package</span></th>
+        <th><span class="ja">新垣<br>(PM)</span><span class="en">Aragaki<br>(PM)</span></th>
+        <th><span class="ja">David<br>(CEO)</span><span class="en">David<br>(CEO)</span></th>
+        <th><span class="ja">Shige<br>(Viaduct CFO)</span><span class="en">Shige<br>(Viaduct CFO)</span></th>
+        <th>KPMG</th>
+        <th><span class="ja">取締役会</span><span class="en">Board</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="task-cell">1.1 <span class="ja">必須15規程ドラフト</span><span class="en">Must-have drafts</span></td><td class="raci-cell raci-r">R,A</td><td class="raci-cell raci-i">I</td><td class="raci-cell raci-c">C</td><td class="raci-cell">—</td><td class="raci-cell raci-i">I</td></tr>
+      <tr><td class="task-cell">1.2 <span class="ja">優先20規程ドラフト</span><span class="en">Priority drafts</span></td><td class="raci-cell raci-r">R,A</td><td class="raci-cell raci-i">I</td><td class="raci-cell raci-c">C</td><td class="raci-cell">—</td><td class="raci-cell">—</td></tr>
+      <tr><td class="task-cell">1.3 <span class="ja">No.11附表1 権限決裁</span><span class="en">No.11 Att.1 authority</span></td><td class="raci-cell raci-r">R</td><td class="raci-cell raci-a">A</td><td class="raci-cell raci-c">C</td><td class="raci-cell">—</td><td class="raci-cell raci-i">I</td></tr>
+      <tr><td class="task-cell">2.1 <span class="ja">フォーマット適用</span><span class="en">Format apply</span></td><td class="raci-cell raci-r">R,A</td><td class="raci-cell">—</td><td class="raci-cell raci-i">I</td><td class="raci-cell">—</td><td class="raci-cell">—</td></tr>
+      <tr><td class="task-cell">2.2 <span class="ja">QAチェック</span><span class="en">QA checklist</span></td><td class="raci-cell raci-r">R,A</td><td class="raci-cell">—</td><td class="raci-cell raci-c">C</td><td class="raci-cell raci-i">I</td><td class="raci-cell">—</td></tr>
+      <tr><td class="task-cell">3.1 <span class="ja">Shigeレビュー</span><span class="en">Shige review</span></td><td class="raci-cell raci-i">I</td><td class="raci-cell">—</td><td class="raci-cell raci-r">R,A</td><td class="raci-cell">—</td><td class="raci-cell">—</td></tr>
+      <tr><td class="task-cell">3.2 KPMG <span class="ja">事前レビュー</span><span class="en">pre-review</span></td><td class="raci-cell raci-r">R</td><td class="raci-cell raci-i">I</td><td class="raci-cell raci-c">C</td><td class="raci-cell raci-a">A</td><td class="raci-cell">—</td></tr>
+      <tr><td class="task-cell">3.3 <span class="ja">取締役会承認</span><span class="en">Board approval</span></td><td class="raci-cell raci-r">R</td><td class="raci-cell raci-c">C</td><td class="raci-cell raci-c">C</td><td class="raci-cell raci-i">I</td><td class="raci-cell raci-a">A</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-h"><span class="ja">ステークホルダー・コミュニケーション計画</span><span class="en">Stakeholder Communication Plan</span></div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title">David (CEO)</div><div class="card-body"><span class="ja">頻度: 週次 / チャネル: 1:1会議 + Slack DM / 内容: 進捗率・ブロッカー（特にNo.11附表1の権限決裁）</span><span class="en">Cadence: weekly · Channel: 1:1 + Slack DM · Content: progress %, blockers (esp. No.11 Att.1 authority decision)</span></div></div>
+    <div class="card"><div class="card-title">Shige (Viaduct CFO)</div><div class="card-body"><span class="ja">頻度: ドラフト完成時 / チャネル: Slack + Google Docコメント / 内容: 財務規程を中心にレビュー</span><span class="en">Cadence: on draft completion · Channel: Slack + Doc comments · Content: focus on finance regulations</span></div></div>
+    <div class="card"><div class="card-title">KPMG</div><div class="card-body"><span class="ja">頻度: 月1回 / チャネル: メール + 監査ミーティング / 内容: Walkthrough準備状況</span><span class="en">Cadence: monthly · Channel: email + audit meeting · Content: walkthrough readiness</span></div></div>
+    <div class="card"><div class="card-title"><span class="ja">取締役会</span><span class="en">Board</span></div><div class="card-body"><span class="ja">頻度: M3直前 / チャネル: 取締役会資料 / 内容: 40規程一括承認決議</span><span class="en">Cadence: just before M3 · Channel: Board deck · Content: single-resolution approval of all 40</span></div></div>
+  </div>
+</section>
+
+<!-- TAB 4: Risk -->
+<section class="panel" data-panel="4">
+  <div class="panel-title">Risk Register</div>
+  <div class="panel-desc"><span class="ja">Risk 4型（回避／低減／移転／保有）で対応戦略を分類。確率×影響ヒートマップで優先度を可視化。</span><span class="en">Response strategies classified into 4 types (Avoid / Mitigate / Transfer / Accept). Probability × Impact heatmap shows priority.</span></div>
+
+  <table class="risk-table">
+    <thead>
+      <tr><th style="width:6%">#</th><th style="width:26%"><span class="ja">リスク事象</span><span class="en">Risk Event</span></th><th style="width:8%"><span class="ja">確率</span><span class="en">Prob</span></th><th style="width:8%"><span class="ja">影響</span><span class="en">Impact</span></th><th style="width:12%"><span class="ja">戦略</span><span class="en">Strategy</span></th><th><span class="ja">対応内容 / トリガー</span><span class="en">Response / Trigger</span></th></tr>
+    </thead>
+    <tbody>
+      <tr><td>R1</td><td><span class="ja">No.11附表1の権限閾値 CEO決裁が遅延し、M1を阻害</span><span class="en">No.11 Att.1 authority threshold CEO decision delays M1</span></td><td><span class="risk-dot" style="background:var(--risk-h)"></span>H</td><td><span class="risk-dot" style="background:var(--risk-h)"></span>H</td><td><span class="strat-pill strat-mitigate"><span class="ja">低減</span><span class="en">Mitigate</span></span></td><td><span class="ja">SRI現行閾値を暫定値とし「v0.9」で進める。CEO承認後v1.0に改定。トリガー: 4/22時点で未決裁</span><span class="en">Use SRI current thresholds as interim v0.9. Revise to v1.0 post-CEO approval. Trigger: unresolved by 4/22</span></td></tr>
+      <tr><td>R2</td><td><span class="ja">Shigeのレビュー工数不足（本業クローズ業務と重複）</span><span class="en">Shige review bandwidth insufficient (monthly close overlap)</span></td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="risk-dot" style="background:var(--risk-h)"></span>H</td><td><span class="strat-pill strat-avoid"><span class="ja">回避</span><span class="en">Avoid</span></span></td><td><span class="ja">レビューを2バッチ（財務系/その他）に分割、5月第1週に先行依頼。月次クローズ期間（5/5-10）を避ける</span><span class="en">Split review in 2 batches (finance / others), front-load in week 1 of May. Avoid close period (5/5-10)</span></td></tr>
+      <tr><td>R3</td><td><span class="ja">KPMGから内部統制 Walkthrough 追加要求</span><span class="en">KPMG requests additional walkthrough items</span></td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="strat-pill strat-transfer"><span class="ja">移転</span><span class="en">Transfer</span></span></td><td><span class="ja">KPMG要求はWS4監査準備Docに切り出し、別プロジェクト化。P-0321-002スコープ外に移す。トリガー: 要求受領時</span><span class="en">Carve out into WS4 audit prep Doc as a separate project; push outside P-0321-002 scope. Trigger: on request receipt</span></td></tr>
+      <tr><td>R4</td><td><span class="ja">GAS Web App の不具合で大量フォーマット適用に失敗</span><span class="en">GAS Web App fails on bulk format apply</span></td><td><span class="risk-dot" style="background:var(--risk-l)"></span>L</td><td><span class="risk-dot" style="background:var(--risk-h)"></span>H</td><td><span class="strat-pill strat-mitigate"><span class="ja">低減</span><span class="en">Mitigate</span></span></td><td><span class="ja">バッチサイズ5件以下で逐次実行、失敗時は手動適用にフォールバック。事前に2件で動作検証</span><span class="en">Run batches of ≤5, fall back to manual. Verify with 2-item smoke test beforehand</span></td></tr>
+      <tr><td>R5</td><td><span class="ja">取締役会日程が5/31以降にスリップ</span><span class="en">Board meeting slips past 5/31</span></td><td><span class="risk-dot" style="background:var(--risk-l)"></span>L</td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="strat-pill strat-accept"><span class="ja">保有</span><span class="en">Accept</span></span></td><td><span class="ja">CEO/Board Secの権限外。発生時は持ち回り決議を提案、遅延はKPMGに事前通知</span><span class="en">Outside CEO/Board Sec control. On occurrence: propose written resolution, notify KPMG in advance</span></td></tr>
+      <tr><td>R6</td><td><span class="ja">規程相互の矛盾（権限規程 vs 経費規程など）</span><span class="en">Cross-regulation conflicts (authority vs expense, etc.)</span></td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="risk-dot" style="background:var(--risk-m)"></span>M</td><td><span class="strat-pill strat-mitigate"><span class="ja">低減</span><span class="en">Mitigate</span></span></td><td><span class="ja">QA（WS2.2）で金額・権限・期間の相互参照チェックリスト実施。Overview SSで相互参照表を作成</span><span class="en">QA (WS2.2) cross-reference check for amounts / authority / tenor. Build cross-ref table on Overview SS</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-h"><span class="ja">確率 × 影響 ヒートマップ</span><span class="en">Probability × Impact Heatmap</span></div>
+  <div class="risk-heatmap">
+    <div class="heat-head"></div>
+    <div class="heat-head">Low Impact</div>
+    <div class="heat-head">Med Impact</div>
+    <div class="heat-head">High Impact</div>
+
+    <div class="heat-head">High P</div>
+    <div class="heat-cell heat-hl"></div>
+    <div class="heat-cell heat-hm"></div>
+    <div class="heat-cell heat-hh"><span class="chip">R1</span></div>
+
+    <div class="heat-head">Med P</div>
+    <div class="heat-cell heat-ml"></div>
+    <div class="heat-cell heat-mm"><span class="chip">R3</span><span class="chip">R6</span></div>
+    <div class="heat-cell heat-mh"><span class="chip">R2</span></div>
+
+    <div class="heat-head">Low P</div>
+    <div class="heat-cell heat-ll"></div>
+    <div class="heat-cell heat-lm"><span class="chip">R5</span></div>
+    <div class="heat-cell heat-lh"><span class="chip">R4</span></div>
+  </div>
+</section>
+
+<!-- TAB 5: Dashboard -->
+<section class="panel" data-panel="5">
+  <div class="panel-title">Progress Dashboard</div>
+  <div class="panel-desc"><span class="ja">2026-04-18 時点のサマリ。バーンダウン・KPI・主要リスクシグナル・次のアクション。</span><span class="en">Snapshot as of 2026-04-18: burndown, KPIs, top risk signals, next actions.</span></div>
+
+  <div class="grid-4" style="margin-bottom:20px">
+    <div class="kpi-card">
+      <div class="kpi-label"><span class="ja">ドラフト完了率</span><span class="en">Draft Completion</span></div>
+      <div class="kpi-value">85%</div>
+      <div class="kpi-sub">34 / 40</div>
+      <div class="progress-track"><div class="progress-fill" style="width:85%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label"><span class="ja">フォーマット適用率</span><span class="en">Format Applied</span></div>
+      <div class="kpi-value">50%</div>
+      <div class="kpi-sub">20 / 40</div>
+      <div class="progress-track"><div class="progress-fill" style="width:50%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label"><span class="ja">全体進捗</span><span class="en">Overall Progress</span></div>
+      <div class="kpi-value">55%</div>
+      <div class="kpi-sub"><span class="ja">WS1 90% · WS2 45% · WS3 0%</span><span class="en">WS1 90% · WS2 45% · WS3 0%</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:55%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label"><span class="ja">残日数</span><span class="en">Days to M3</span></div>
+      <div class="kpi-value">43</div>
+      <div class="kpi-sub"><span class="ja">2026-05-31 まで</span><span class="en">until 2026-05-31</span></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="ja">バーンダウン</span><span class="en">Burndown</span></div>
+      <svg viewBox="0 0 400 220" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#E8E8E8" stroke-width="0.5">
+          <line x1="40" y1="30" x2="40" y2="180"/>
+          <line x1="40" y1="180" x2="390" y2="180"/>
+        </g>
+        <g font-size="9" fill="#9A9A9A">
+          <text x="10" y="34">40</text>
+          <text x="10" y="108">20</text>
+          <text x="10" y="183">0</text>
+          <text x="40" y="200" text-anchor="middle">3/21</text>
+          <text x="127" y="200" text-anchor="middle">4/04</text>
+          <text x="215" y="200" text-anchor="middle">4/18</text>
+          <text x="302" y="200" text-anchor="middle">5/02</text>
+          <text x="390" y="200" text-anchor="middle">5/31</text>
+        </g>
+        <!-- Ideal line -->
+        <line x1="40" y1="30" x2="390" y2="180" stroke="#9A9A9A" stroke-dasharray="4 3" stroke-width="1"/>
+        <text x="340" y="60" font-size="9" fill="#9A9A9A">Ideal</text>
+        <!-- Actual (drafts remaining) -->
+        <polyline points="40,30 85,30 127,60 170,78 215,52 260,52 302,52 390,30" fill="none" stroke="#E46962" stroke-width="0" stroke-dasharray="3 3"/>
+        <polyline points="40,30 85,30 127,60 170,78 215,52" fill="none" stroke="#4A90D9" stroke-width="2"/>
+        <circle cx="215" cy="52" r="4" fill="#4A90D9"/>
+        <text x="223" y="48" font-size="10" fill="#4A90D9" font-weight="600">6 left</text>
+        <!-- Forecast -->
+        <polyline points="215,52 260,48 302,48 390,30" fill="none" stroke="#4A90D9" stroke-width="2" stroke-dasharray="3 3"/>
+        <text x="300" y="40" font-size="9" fill="#4A90D9">Forecast</text>
+      </svg>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px"><span class="ja">実線＝実績 / 破線＝予測。WS2.1フォーマット適用が開始し進捗加速中。</span><span class="en">Solid = actual / Dashed = forecast. WS2.1 format apply has started, velocity accelerating.</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="ja">アラート・シグナル</span><span class="en">Alerts &amp; Signals</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:rgba(228,105,98,0.06);border-left:3px solid var(--blocked);border-radius:4px;font-size:12px">
+          <span class="badge badge-stop">BLOCKED</span>
+          <div><strong><span class="ja">No.11附表1（1.3）がCEO決裁待ち</span><span class="en">No.11 Att.1 (WP 1.3) awaiting CEO decision</span></strong><br><span style="color:var(--text-muted)"><span class="ja">R1 発動条件に到達。暫定版v0.9で進行することを推奨。</span><span class="en">R1 trigger reached. Recommend proceeding with interim v0.9.</span></span></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:rgba(245,166,35,0.08);border-left:3px solid var(--milestone);border-radius:4px;font-size:12px">
+          <span class="badge badge-warn">AT RISK</span>
+          <div><strong><span class="ja">M1 (2026-04-25) まで残7日</span><span class="en">M1 (2026-04-25) in 7 days</span></strong><br><span style="color:var(--text-muted)"><span class="ja">残6件ドラフト + No.11附表1。1.3解決しない場合はスコープ分割を検討。</span><span class="en">6 drafts left + No.11 Att.1. If 1.3 not resolved, consider scope split.</span></span></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:rgba(74,144,217,0.08);border-left:3px solid var(--inprog);border-radius:4px;font-size:12px">
+          <span class="badge" style="background:rgba(74,144,217,0.18);color:var(--accent)">ON TRACK</span>
+          <div><strong><span class="ja">WS2.1 フォーマット適用は50%完了</span><span class="en">WS2.1 format apply at 50%</span></strong><br><span style="color:var(--text-muted)"><span class="ja">GAS安定稼働、ペース維持で5/02 M2達成見込み。</span><span class="en">GAS stable; at current pace M2 (5/02) achievable.</span></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-h" style="margin-top:24px"><span class="ja">次のアクション（Top 3）</span><span class="en">Next Actions (Top 3)</span></div>
+  <div class="grid-3">
+    <div class="card"><div class="card-title">1. <span class="ja">暫定版v0.9で1.3を進める</span><span class="en">Advance 1.3 with interim v0.9</span></div><div class="card-body"><span class="ja">期限: 2026-04-20 / 担当: 新垣 → David</span><span class="en">Due 2026-04-20 · Owner: Aragaki → David</span></div></div>
+    <div class="card"><div class="card-title">2. <span class="ja">残6件ドラフト完了</span><span class="en">Finish remaining 6 drafts</span></div><div class="card-body"><span class="ja">期限: 2026-04-25 / 担当: 新垣</span><span class="en">Due 2026-04-25 · Owner: Aragaki</span></div></div>
+    <div class="card"><div class="card-title">3. <span class="ja">Shigeレビュー日程を確定</span><span class="en">Lock Shige review schedule</span></div><div class="card-body"><span class="ja">期限: 2026-04-30 / 5月クローズ期間を避けた分割依頼</span><span class="en">Due 2026-04-30 · Split-batch ask avoiding May close period</span></div></div>
+  </div>
+</section>
+
+<footer>
+  <div>Skill9 · Project &amp; Task Engine · PMP T2 · <span class="ja">生成</span><span class="en">Generated</span> 2026-04-18 · P-0321-002</div>
+  <div>Tabs <kbd>1</kbd>–<kbd>6</kbd> · Print <kbd>Ctrl</kbd>+<kbd>P</kbd> · Lang <kbd>L</kbd></div>
+</footer>
+
+</div>
+
+<script type="application/json" id="pmp-data">
+{"meta":{"projectId":"P-0321-002","name":"Viaduct Governance Regulations","tier":"T2","approach":"predictive","start":"2026-03-21","target":"2026-05-31","pm":"Aragaki","sponsor":"David","languages":["ja","en"]},"priorityTriangle":{"scope":"fixed","time":"fixed","cost":"flexible","quality":"accept"},"wbs":[{"code":"1.1","name":"Must-have 15 drafts","due":"2026-04-10","owner":"Aragaki","status":"done"},{"code":"1.2","name":"Priority 20 drafts","due":"2026-04-25","owner":"Aragaki","status":"inprog","progress":0.95},{"code":"1.3","name":"No.11 Att.1 authority matrix","due":"2026-04-22","owner":"David","status":"blocked"},{"code":"2.1","name":"Format apply (GAS)","due":"2026-05-02","owner":"Aragaki","status":"inprog","progress":0.5},{"code":"2.2","name":"QA checklist","due":"2026-05-06","owner":"Aragaki","status":"todo"},{"code":"3.1","name":"Shige review","due":"2026-05-15","owner":"Shigematsu","status":"todo"},{"code":"3.2","name":"KPMG pre-review","due":"2026-05-22","owner":"Aragaki","status":"todo"},{"code":"3.3","name":"Board approval","due":"2026-05-31","owner":"David","status":"todo"}],"criticalPath":["1.2","1.3","2.1","3.1","3.3"],"milestones":[{"id":"M1","name":"All drafts complete","date":"2026-04-25","status":"inprog"},{"id":"M2","name":"Format & QA complete","date":"2026-05-06","status":"todo"},{"id":"M3","name":"Board approved","date":"2026-05-31","status":"todo"}],"risks":[{"id":"R1","event":"No.11 Att.1 CEO decision delay","prob":"H","impact":"H","strategy":"mitigate"},{"id":"R2","event":"Shige review bandwidth","prob":"M","impact":"H","strategy":"avoid"},{"id":"R3","event":"KPMG additional walkthrough","prob":"M","impact":"M","strategy":"transfer"},{"id":"R4","event":"GAS bulk format failure","prob":"L","impact":"H","strategy":"mitigate"},{"id":"R5","event":"Board date slip","prob":"L","impact":"M","strategy":"accept"},{"id":"R6","event":"Cross-regulation conflict","prob":"M","impact":"M","strategy":"mitigate"}],"kpi":{"draftCompletion":0.85,"formatApplied":0.5,"overallProgress":0.55,"daysToM3":43}}
+</script>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+  function activate(idx){
+    tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===String(idx)));
+    panels.forEach(p=>p.classList.toggle('active', p.dataset.panel===String(idx)));
+  }
+  tabs.forEach(t=>t.addEventListener('click',()=>activate(Number(t.dataset.tab))));
+
+  const langBtns = document.querySelectorAll('[data-set-lang]');
+  function setLang(lang){
+    document.body.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    langBtns.forEach(b=>b.classList.toggle('active', b.dataset.setLang===lang));
+    try{ localStorage.setItem('skill9-lang', lang); }catch(_){}
+  }
+  langBtns.forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.setLang)));
+  try{
+    const saved = localStorage.getItem('skill9-lang');
+    if(saved==='en'||saved==='ja') setLang(saved);
+  }catch(_){}
+
+  document.addEventListener('keydown', e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+    const n = Number(e.key);
+    if(n>=1&&n<=6) activate(n-1);
+    if(e.key.toLowerCase()==='r') activate(0);
+    if(e.key.toLowerCase()==='l') setLang(document.body.getAttribute('data-lang')==='ja'?'en':'ja');
+  });
+})();
+</script>
+
+</body>
+</html>
