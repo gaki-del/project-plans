@@ -159,6 +159,36 @@ nav.tabs::-webkit-scrollbar{display:none}
 .wbs-table .col-medium{width:120px}
 .wbs-table .col-owner{width:130px;color:var(--text);font-weight:500}
 
+/* Drafts table (Tab 07) */
+.drafts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+.drafts-card-head{display:flex;align-items:center;gap:12px;padding:14px 20px;color:#fff;font-size:13px;letter-spacing:.04em}
+.drafts-head-pri{background:linear-gradient(90deg,#393939 0%,#5A5A5A 100%)}
+.drafts-head-std{background:linear-gradient(90deg,#6B6B6B 0%,#8E8E8E 100%)}
+.drafts-card-head .drafts-mark{font-size:18px;line-height:1;opacity:.9}
+.drafts-card-head .drafts-title{font-weight:600;font-size:14px;letter-spacing:.02em;text-transform:uppercase}
+.drafts-card-head .drafts-count{margin-left:auto;font-size:11px;font-weight:400;opacity:.75;letter-spacing:.06em;text-transform:uppercase}
+.drafts-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.drafts-table thead th{font-size:10px;font-weight:500;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;text-align:left;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.drafts-table tbody td{padding:12px 14px;vertical-align:middle}
+.drafts-table tbody tr{transition:background .12s ease}
+.drafts-table tbody tr:hover{background:rgba(74,144,217,0.04)}
+.drafts-table .dr-no{width:56px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);text-align:right;padding-right:16px}
+.drafts-table thead .dr-no{text-align:right}
+.drafts-table .dr-cat{width:168px;font-size:12px;color:var(--text-muted)}
+.drafts-table .dr-name{font-weight:500;color:var(--primary);font-size:13.5px;line-height:1.45;word-wrap:break-word}
+.drafts-table .dr-status{width:172px}
+.drafts-table .dr-action{width:96px;text-align:right;padding-right:18px}
+.drafts-table thead .dr-action{text-align:right}
+.draft-open{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:var(--primary);color:#fff;border-radius:999px;font-size:11px;text-decoration:none;font-weight:500;letter-spacing:.03em;transition:all .15s ease;white-space:nowrap}
+.draft-open:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 2px 6px rgba(74,144,217,0.25)}
+.draft-open .draft-arrow{font-size:10px;line-height:1;display:inline-block;transition:transform .15s}
+.draft-open:hover .draft-arrow{transform:translate(1px,-1px)}
+@media (max-width:720px){
+  .drafts-table{table-layout:auto}
+  .drafts-table .dr-cat{display:none}
+  .drafts-table .dr-status{width:auto}
+}
+
 /* Gantt */
 .gantt-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;overflow-x:auto}
 .gantt-legend{display:flex;gap:18px;margin-bottom:16px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
@@ -357,7 +387,8 @@ footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);bor
     { "id": "schedule",  "num": "03", "label": { "ja": "Schedule",  "en": "Schedule" } },
     { "id": "raci",      "num": "04", "label": { "ja": "RACI",      "en": "RACI" } },
     { "id": "risk",      "num": "05", "label": { "ja": "Risk",      "en": "Risk" } },
-    { "id": "dashboard", "num": "06", "label": { "ja": "Dashboard", "en": "Dashboard" } }
+    { "id": "dashboard", "num": "06", "label": { "ja": "Dashboard", "en": "Dashboard" } },
+    { "id": "drafts",    "num": "07", "label": { "ja": "成果物",    "en": "Drafts" } }
   ],
   "charter": {
     "title": { "ja": "Project Charter", "en": "Project Charter" },
@@ -769,7 +800,8 @@ footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);bor
       renderSchedule(),
       renderRaci(),
       renderRisk(),
-      renderDashboard()
+      renderDashboard(),
+      renderDrafts()
     ].join('');
   }
 
@@ -1162,54 +1194,99 @@ footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);bor
       </div>
       <div class="section-h" style="margin-top:24px">${i18nSpan('dashboard.actionsTitle',{noPair:true})}</div>
       <div class="grid-3">${actionsHtml}</div>
-      ${renderDraftsBlock()}
     </section>`;
   }
 
-  function renderDraftsBlock(){
+  // ---- TAB 7: Drafts ----
+  function renderDrafts(){
     const d = data.dashboard;
-    if(!d.draftsPriority && !d.draftsStandard) return '';
-    function statusClass(s){
-      if(/Audited|CXO Ready/.test(s)) return 'pt-fixed';
-      if(/QA Fixed/.test(s))          return 'pt-flexible';
-      if(/Draft/.test(s))             return '';
-      if(/N\/A/.test(s))              return '';
-      if(/Pending/.test(s))           return 'pt-accept';
-      return '';
+    function statusPill(s){
+      let bg='rgba(154,154,154,0.12)', fg='#6B6B6B';
+      if(/Audited|CXO Ready/.test(s)){ bg='rgba(46,174,95,0.12)'; fg='#1F7A3E'; }
+      else if(/QA Fixed/.test(s))     { bg='rgba(74,144,217,0.12)'; fg='#2C5F9E'; }
+      else if(/Draft/.test(s))        { bg='rgba(154,154,154,0.14)'; fg='#595959'; }
+      else if(/N\/A/.test(s))         { bg='rgba(154,154,154,0.08)'; fg='#9A9A9A'; }
+      else if(/Pending/.test(s))      { bg='rgba(245,166,35,0.16)'; fg='#8A6D1A'; }
+      return `<span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;background:${bg};color:${fg};white-space:nowrap">${esc(s)}</span>`;
     }
-    function row(r){
-      const link = r.link ? `<a href="${esc(r.link)}" target="_blank" rel="noopener" style="display:inline-block;padding:3px 10px;background:var(--primary);color:#fff;border-radius:4px;font-size:11px;text-decoration:none;font-weight:500">Open ↗</a>` : `<span style="color:var(--text-subtle);font-size:11px">—</span>`;
-      return `<tr>
-        <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-muted);width:48px">${esc(r.no)}</td>
-        <td style="font-size:12px;color:var(--text-muted);width:140px">${esc(r.cat)}</td>
-        <td style="font-weight:500;color:var(--primary)">${r.link? `<a href="${esc(r.link)}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none">${esc(r.name)}</a>` : esc(r.name)}</td>
-        <td style="width:180px"><span class="badge" style="background:var(--surface-2);color:var(--text-muted);font-size:11px;padding:2px 8px;border-radius:10px">${esc(r.status)}</span></td>
-        <td style="width:80px;text-align:right">${link}</td>
+    function row(r, idx, total){
+      const isLast = idx===total-1;
+      const border = isLast ? '' : 'border-bottom:1px solid var(--border)';
+      const openBtn = r.link
+        ? `<a href="${esc(r.link)}" target="_blank" rel="noopener" class="draft-open">Open <span class="draft-arrow">↗</span></a>`
+        : `<span style="display:inline-block;padding:6px 16px;color:var(--text-subtle);font-size:11px;font-weight:400">—</span>`;
+      const nameCell = r.link
+        ? `<a href="${esc(r.link)}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none;border-bottom:1px dotted transparent;transition:border-color .15s" onmouseover="this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.borderBottomColor='transparent'">${esc(r.name)}</a>`
+        : `<span style="color:var(--text-muted)">${esc(r.name)}</span>`;
+      return `<tr style="${border}">
+        <td class="dr-no">${esc(r.no)}</td>
+        <td class="dr-cat">${esc(r.cat)}</td>
+        <td class="dr-name">${nameCell}</td>
+        <td class="dr-status">${statusPill(r.status)}</td>
+        <td class="dr-action">${openBtn}</td>
       </tr>`;
     }
-    const priRows = (d.draftsPriority||[]).map(row).join('');
-    const stdRows = (d.draftsStandard||[]).map(row).join('');
-    const priCount = (d.draftsPriority||[]).length;
-    const stdCount = (d.draftsStandard||[]).length;
-    const ovLink = `<a href="https://docs.google.com/spreadsheets/d/1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA/edit" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px">Overview SS ↗</a>`;
-    return `
-      <div class="section-h" style="margin-top:32px;display:flex;justify-content:space-between;align-items:baseline">
-        <span>${i18nSpan('dashboard.draftsTitle',{noPair:true})}</span>
-        <span style="font-size:12px;color:var(--text-muted);font-weight:400">${ovLink}</span>
+    const pri = (d.draftsPriority||[]);
+    const std = (d.draftsStandard||[]);
+    const priRows = pri.map((r,i)=>row(r,i,pri.length)).join('');
+    const stdRows = std.map((r,i)=>row(r,i,std.length)).join('');
+    const priReady = pri.filter(r=>/Audited|CXO Ready/.test(r.status)).length;
+    const stdFixed = std.filter(r=>/QA Fixed/.test(r.status)).length;
+    const ovLink = `<a href="https://docs.google.com/spreadsheets/d/1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA/edit" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:12px;font-weight:500">Overview SS ↗</a>`;
+
+    return `<section class="panel${currentTab===6?' active':''}" data-panel="6">
+      <div class="panel-title">${i18nSpan('dashboard.draftsTitle',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('dashboard.draftsNote',{noPair:true})}</div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(46,174,95,0.12);color:#1F7A3E;border-radius:14px;font-size:11px;font-weight:500">◎ CXO Ready <b style="font-weight:600">${priReady}/${pri.length}</b></span>
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(74,144,217,0.12);color:#2C5F9E;border-radius:14px;font-size:11px;font-weight:500">○ QA Fixed <b style="font-weight:600">${stdFixed}/${std.length}</b></span>
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:var(--surface-2);color:var(--text-muted);border-radius:14px;font-size:11px;font-weight:500">Total Drafts <b style="font-weight:600">${pri.filter(r=>r.link).length + std.filter(r=>r.link).length}</b></span>
+        </div>
+        ${ovLink}
       </div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;margin-bottom:14px">${i18nSpan('dashboard.draftsNote',{noPair:true})}</div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px">
-        <div style="background:var(--primary);color:#fff;padding:10px 16px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">◎ Priority Regulations (${priCount})</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
+
+      <div class="drafts-card">
+        <div class="drafts-card-head drafts-head-pri">
+          <span class="drafts-mark">◎</span>
+          <span class="drafts-title">Priority Regulations</span>
+          <span class="drafts-count">${pri.length} items</span>
+        </div>
+        <table class="drafts-table">
+          <thead>
+            <tr>
+              <th class="dr-no">No.</th>
+              <th class="dr-cat">Category</th>
+              <th class="dr-name">Regulation Name</th>
+              <th class="dr-status">Status</th>
+              <th class="dr-action">Draft</th>
+            </tr>
+          </thead>
           <tbody>${priRows}</tbody>
         </table>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">
-        <div style="background:var(--text-muted);color:#fff;padding:10px 16px;font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">○ Standard Regulations (${stdCount})</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
+
+      <div class="drafts-card" style="margin-top:20px">
+        <div class="drafts-card-head drafts-head-std">
+          <span class="drafts-mark">○</span>
+          <span class="drafts-title">Standard Regulations</span>
+          <span class="drafts-count">${std.length} items</span>
+        </div>
+        <table class="drafts-table">
+          <thead>
+            <tr>
+              <th class="dr-no">No.</th>
+              <th class="dr-cat">Category</th>
+              <th class="dr-name">Regulation Name</th>
+              <th class="dr-status">Status</th>
+              <th class="dr-action">Draft</th>
+            </tr>
+          </thead>
           <tbody>${stdRows}</tbody>
         </table>
-      </div>`;
+      </div>
+    </section>`;
   }
 
   function renderFooter(){
@@ -1654,7 +1731,7 @@ footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);bor
       return;
     }
     const n = Number(e.key);
-    if(n>=1 && n<=6){ activateTab(n-1); return; }
+    if(n>=1 && n<=7){ activateTab(n-1); return; }
     if(e.key.toLowerCase()==='r'){ activateTab(0); return; }
     if(e.key.toLowerCase()==='l'){ setLang(currentLang==='ja'?'en':'ja'); return; }
     if(e.key.toLowerCase()==='e'){ setEditMode(!editMode); return; }
