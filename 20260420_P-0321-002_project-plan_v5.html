@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Plan v4 — Viaduct Governance Regulations (P-0321-002)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+JP:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FAFAFA; --surface:#FFFFFF; --surface-2:#F5F5F5;
+  --border:#E8E8E8; --border-strong:#D4D4D4;
+  --text:#1A1A1A; --text-muted:#6B6B6B; --text-subtle:#9A9A9A;
+  --primary:#393939; --accent:#4A90D9;
+  --done:#2EAE5F; --inprog:#4A90D9; --todo:#9A9A9A; --blocked:#E46962;
+  --critical:#E46962; --milestone:#F5A623;
+  --risk-h:#E46962; --risk-m:#F5A623; --risk-l:#2EDF75;
+  --avoid:#C94A43; --mitigate:#E8A73C; --transfer:#4A90D9; --accept:#6B6B6B;
+  --estimated:#FFF8E1; --estimated-border:#F5D76E;
+  --edit-outline:#4A90D9; --edit-bg:rgba(74,144,217,0.04);
+  --edited:#F5A623; --star:#F5A623;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 2px 8px rgba(0,0,0,0.06); --shadow-lg:0 8px 24px rgba(0,0,0,0.12);
+  --radius-sm:4px; --radius-md:8px; --radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'IBM Plex Sans','IBM Plex Sans JP',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.container{max-width:1280px;margin:0 auto;padding:32px 28px 64px}
+
+/* toolbar */
+.toolbar{position:fixed;top:16px;right:20px;z-index:100;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 40px)}
+.pill-group{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px;box-shadow:var(--shadow-sm);font-size:11px;font-weight:500}
+.pill-group button{background:transparent;border:none;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--text-muted);font-family:inherit;font-weight:500;letter-spacing:.04em;transition:all .15s ease}
+.pill-group button.active{background:var(--primary);color:#fff}
+.pill-group button:hover:not(.active){color:var(--text)}
+.pill-group button.edit-active{background:var(--star);color:#fff}
+.status-chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:11px;font-weight:500;color:var(--text-muted);box-shadow:var(--shadow-sm);display:none}
+.status-chip.visible{display:inline-flex;align-items:center;gap:6px}
+.status-chip .dot{width:7px;height:7px;border-radius:50%;background:var(--edited)}
+
+/* edit mode */
+body.edit-mode .editable{outline:1px dashed var(--edit-outline);outline-offset:2px;background:var(--edit-bg);transition:background .15s ease;position:relative;border-radius:2px}
+body.edit-mode .editable:hover{background:rgba(74,144,217,0.09)}
+body.edit-mode .editable:focus{outline-style:solid;outline-width:2px;background:rgba(74,144,217,0.12)}
+.edit-marker{display:none}
+body.edit-mode .edit-marker{display:inline-block;position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--edited);border:1.5px solid #fff;z-index:2;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.pair-edit-btn{display:none;position:absolute;top:-4px;right:-22px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:10px;line-height:1;padding:0;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+body.edit-mode .editable-pair:hover .pair-edit-btn{display:flex;align-items:center;justify-content:center}
+.lang-warn{display:none;position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--risk-h);border:1.5px solid #fff;z-index:2}
+body.edit-mode .editable-pair.missing-lang .lang-warn{display:inline-block}
+
+header.hero{margin-bottom:24px}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:8px}
+h1.title{font-size:28px;font-weight:600;letter-spacing:-0.01em;color:var(--primary);margin-bottom:6px}
+.subtitle{font-size:15px;color:var(--text-muted)}
+.meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.meta-item{font-size:12px;color:var(--text-muted)}
+.meta-item strong{color:var(--text);font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.badge-mode{background:var(--primary);color:#fff}
+.badge-t2{background:var(--accent);color:#fff}
+.badge-ok{background:rgba(46,174,95,0.12);color:var(--done)}
+.badge-warn{background:rgba(245,166,35,0.18);color:#8A6D1A}
+.badge-stop{background:rgba(201,74,67,0.12);color:var(--avoid)}
+.badge-est{background:var(--estimated);color:#8A6D1A;border:1px solid var(--estimated-border)}
+.badge-v2{background:var(--accent);color:#fff}
+.badge-v3{background:linear-gradient(135deg,#4A90D9,#2EAE5F);color:#fff}
+
+/* v3: translate feature */
+.pill-group button.tl-active{background:#2EAE5F;color:#fff}
+.icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:999px;width:30px;height:30px;cursor:pointer;color:var(--text-muted);font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);transition:all .15s ease;padding:0}
+.icon-btn:hover{color:var(--text);background:var(--surface-2)}
+.icon-btn.has-key{color:var(--done)}
+.tl-spinner{display:none;position:absolute;top:-6px;right:14px;width:12px;height:12px;border:2px solid rgba(74,144,217,0.25);border-top-color:var(--accent);border-radius:50%;animation:tlspin .8s linear infinite;z-index:3}
+.editable.tl-loading .tl-spinner{display:inline-block}
+.tl-flash{display:none;position:absolute;top:-6px;right:14px;width:10px;height:10px;border-radius:50%;z-index:3;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.editable.tl-ok .tl-flash{display:inline-block;background:var(--done);animation:tlflash .6s ease-out}
+.editable.tl-err .tl-flash{display:inline-block;background:var(--risk-h)}
+.editable.tl-err{outline-color:var(--risk-h)!important}
+@keyframes tlspin{to{transform:rotate(360deg)}}
+@keyframes tlflash{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2)}}
+.tl-tooltip{position:absolute;top:12px;right:-8px;background:var(--risk-h);color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;white-space:nowrap;z-index:10;box-shadow:var(--shadow-md);max-width:220px;pointer-events:none}
+.tl-tooltip::before{content:'';position:absolute;top:-4px;right:12px;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:4px solid var(--risk-h)}
+
+/* v3: API key modal / confirm modal */
+.modal-narrow{max-width:520px}
+.modal-body-single{padding:20px 24px;display:block}
+.modal-body-single p{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px}
+.modal-body-single p.small{font-size:11px;color:var(--text-subtle)}
+.modal-body-single a{color:var(--accent);text-decoration:none}
+.modal-body-single a:hover{text-decoration:underline}
+.modal-body-single input[type="text"],.modal-body-single input[type="password"]{width:100%;font-family:'IBM Plex Mono',monospace;font-size:12px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);background:var(--bg)}
+.modal-body-single input:focus{outline:none;border-color:var(--accent);background:#fff}
+.cost-note{font-size:11px;color:var(--text-subtle);background:var(--surface-2);border-radius:var(--radius-sm);padding:8px 12px;margin-top:12px;font-family:'IBM Plex Mono',monospace}
+.translate-row{display:flex;gap:8px;margin-top:10px}
+.translate-row .btn{flex:1;font-size:11px}
+.btn-tl{background:#2EAE5F;color:#fff;border-color:#2EAE5F}
+.btn-tl:hover{background:#279B50}
+.btn-danger{background:#fff;color:var(--risk-h);border-color:var(--risk-h)}
+.btn-danger:hover{background:rgba(228,105,98,0.08)}
+
+/* confirm popover */
+.tl-confirm{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--shadow-lg);z-index:250;max-width:320px;font-size:12px}
+.tl-confirm .tl-confirm-title{font-weight:600;margin-bottom:6px;color:var(--primary)}
+.tl-confirm .tl-confirm-body{color:var(--text-muted);margin-bottom:10px;line-height:1.5}
+.tl-confirm .tl-confirm-row{display:flex;gap:6px;justify-content:flex-end}
+.tl-confirm button{font-size:11px;padding:5px 10px}
+
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:transparent;border:none;padding:12px 18px;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s ease;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-num{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-subtle);font-weight:400}
+.tab-btn.active .tab-num{color:var(--primary)}
+
+.panel{display:none;animation:fade .3s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.section-h{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:12px;margin-top:24px}
+.section-h:first-child{margin-top:0}
+.panel-title{font-size:20px;font-weight:600;color:var(--primary);margin-bottom:4px;letter-spacing:-0.01em}
+.panel-desc{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+
+/* Charter */
+.charter-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+.charter-table tr td{padding:14px 16px;border-top:1px solid var(--border);font-size:13px;vertical-align:top}
+.charter-table tr:first-child td{border-top:none}
+.charter-table td.key{width:26%;background:var(--surface-2);font-weight:500;color:var(--text);font-size:12px;letter-spacing:.02em}
+.charter-table td.val{color:var(--text-muted);line-height:1.65;white-space:pre-line}
+
+.priority-triangle{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.pt-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;font-size:12px}
+.pt-cell .pt-label{font-size:10px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.pt-cell .pt-val{font-weight:600;color:var(--primary);font-size:13px}
+.pt-fixed{background:rgba(228,105,98,0.08);border-color:var(--critical)}
+.pt-fixed .pt-val{color:var(--critical)}
+.pt-flexible{background:rgba(74,144,217,0.08);border-color:var(--accent)}
+.pt-flexible .pt-val{color:var(--accent)}
+.pt-accept{background:rgba(154,154,154,0.08)}
+
+/* WBS */
+.wbs-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);font-size:13px}
+.wbs-table thead th{background:var(--primary);color:#fff;font-weight:500;font-size:12px;padding:12px 14px;text-align:left;letter-spacing:.02em}
+.wbs-table tbody td{padding:11px 14px;border-top:1px solid var(--border);vertical-align:top}
+.wbs-l1 td{background:#F0F0F0;font-weight:600;color:var(--primary);font-size:12px;letter-spacing:.03em;text-transform:uppercase}
+.wbs-l2 td{background:var(--surface);font-weight:500;color:var(--text)}
+.wbs-l2 td.wbs-code{color:var(--accent);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500}
+.wbs-l3 td{color:var(--text-muted);font-size:12.5px}
+.wbs-l3 td.wbs-code{color:var(--text-subtle);font-family:'IBM Plex Mono',monospace;font-size:11px;padding-left:28px}
+.wbs-status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.status-done{background:rgba(46,174,95,0.15);color:var(--done)}
+.status-inprog{background:rgba(74,144,217,0.15);color:var(--inprog)}
+.status-todo{background:var(--surface-2);color:var(--text-muted)}
+.status-blocked{background:rgba(228,105,98,0.12);color:var(--blocked)}
+.wbs-table .col-narrow{width:90px}
+.wbs-table .col-medium{width:120px}
+.wbs-table .col-owner{width:130px;color:var(--text);font-weight:500}
+
+/* Gantt */
+.gantt-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;overflow-x:auto}
+.gantt-legend{display:flex;gap:18px;margin-bottom:16px;flex-wrap:wrap;font-size:12px;color:var(--text-muted)}
+.gantt-legend-item{display:flex;align-items:center;gap:6px}
+.gantt-swatch{width:14px;height:10px;border-radius:2px;display:inline-block}
+
+/* RACI */
+.raci-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.raci-table th,.raci-table td{padding:10px 12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center}
+.raci-table th{background:var(--surface-2);font-weight:500;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.raci-table td.task-cell{text-align:left;font-weight:500;color:var(--text);background:var(--surface)}
+.raci-table td.raci-cell{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.raci-r{background:rgba(74,144,217,0.12);color:var(--accent)}
+.raci-a{background:rgba(245,166,35,0.15);color:#8A6D1A}
+.raci-c{background:rgba(154,154,154,0.10);color:var(--text-muted)}
+.raci-i{background:rgba(46,174,95,0.08);color:var(--done)}
+
+/* Risk */
+.risk-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.risk-table th,.risk-table td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.risk-table th{background:var(--surface-2);font-weight:500;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.risk-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.strat-pill{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.strat-avoid{background:rgba(201,74,67,0.15);color:var(--avoid)}
+.strat-mitigate{background:rgba(232,167,60,0.18);color:#8A6D1A}
+.strat-transfer{background:rgba(74,144,217,0.15);color:var(--accent)}
+.strat-accept{background:rgba(154,154,154,0.15);color:var(--text-muted)}
+
+.risk-heatmap{display:grid;grid-template-columns:60px repeat(3,1fr);grid-template-rows:30px repeat(3,90px);gap:2px;margin-top:16px;max-width:560px}
+.heat-head{background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+.heat-cell{background:var(--surface);border:1px solid var(--border);padding:6px;font-size:10px;position:relative;color:var(--text-muted)}
+.heat-hh,.heat-hm,.heat-mh{background:rgba(228,105,98,0.22)}
+.heat-hl,.heat-ml,.heat-mm{background:rgba(245,166,35,0.22)}
+.heat-lh,.heat-lm,.heat-ll{background:rgba(46,223,117,0.18)}
+.heat-cell .chip{display:inline-block;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;font-size:10px;font-weight:600;color:var(--text);margin:2px 2px 0 0;font-family:'IBM Plex Mono',monospace}
+
+/* Dashboard */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:8px;color:var(--primary)}
+.card-body{font-size:13px;color:var(--text-muted);white-space:pre-line}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;color:var(--text-subtle);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-weight:500}
+.kpi-value{font-size:28px;font-weight:600;color:var(--primary);letter-spacing:-0.01em}
+.kpi-sub{font-size:12px;color:var(--text-muted);margin-top:6px}
+.progress-track{background:var(--surface-2);height:8px;border-radius:4px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent) 0%,var(--done) 100%);border-radius:4px}
+.milestone-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
+.ms-row{display:grid;grid-template-columns:90px 1fr 110px 90px;padding:12px 16px;border-top:1px solid var(--border);font-size:13px;align-items:center;gap:12px}
+.ms-row:first-child{border-top:none}
+.ms-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-subtle)}
+.ms-name{color:var(--text);font-weight:500}
+.ms-owner{font-size:12px;color:var(--text-muted)}
+
+.signal-row{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:4px;font-size:12px;margin-bottom:8px}
+.signal-row.blocked{background:rgba(228,105,98,0.06);border-left:3px solid var(--blocked)}
+.signal-row.risk{background:rgba(245,166,35,0.08);border-left:3px solid var(--milestone)}
+.signal-row.ok{background:rgba(74,144,217,0.08);border-left:3px solid var(--inprog)}
+
+footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:11px;color:var(--text-subtle);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer kbd{font-family:'IBM Plex Mono',monospace;background:var(--surface-2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-size:10px}
+
+/* Modal */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.visible{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);max-width:720px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow-lg)}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600;color:var(--primary)}
+.modal-sub{font-size:11px;color:var(--text-subtle);margin-top:2px;font-family:'IBM Plex Mono',monospace;word-break:break-all}
+.modal-close{background:transparent;border:none;font-size:20px;color:var(--text-muted);cursor:pointer;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.modal-close:hover{background:var(--surface-2);color:var(--text)}
+.modal-body{padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:700px){.modal-body{grid-template-columns:1fr}}
+.modal-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:6px}
+.modal-field textarea{width:100%;min-height:140px;font-family:inherit;font-size:13px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);resize:vertical;line-height:1.55;color:var(--text);background:var(--bg)}
+.modal-field textarea:focus{outline:none;border-color:var(--accent);background:#fff}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.btn{background:var(--surface);border:1px solid var(--border);padding:8px 16px;border-radius:var(--radius-sm);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;color:var(--text);transition:all .15s ease}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:#1A1A1A}
+
+@media print{
+  body{background:#fff}
+  .toolbar,nav.tabs,.status-chip,.modal-backdrop{display:none!important}
+  .panel{display:block!important;page-break-before:always}
+  .panel:first-of-type{page-break-before:auto}
+  footer{display:none}
+  body.edit-mode .editable{outline:none!important;background:transparent!important}
+  .edit-marker,.pair-edit-btn,.lang-warn{display:none!important}
+}
+@media (max-width:860px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .priority-triangle{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body data-lang="ja">
+
+<div class="toolbar" role="toolbar" aria-label="Controls">
+  <div class="status-chip" id="status-chip"><span class="dot"></span><span id="status-text"></span></div>
+  <div class="pill-group" role="group" aria-label="Language">
+    <button type="button" data-set-lang="ja" class="active">日本語</button>
+    <button type="button" data-set-lang="en">English</button>
+  </div>
+  <div class="pill-group" role="group" aria-label="Edit">
+    <button type="button" id="edit-toggle">編集</button>
+  </div>
+  <div class="pill-group" role="group" aria-label="Translate" title="Cloudflare Worker経由で自動翻訳（APIキーは端末に保存されません）">
+    <button type="button" id="tl-toggle" title="OFF: 翻訳なし / ON: JA/EN blur時に反対言語を自動翻訳">🌐 翻訳</button>
+  </div>
+  <div class="pill-group edit-only" role="group" aria-label="Export" style="display:none">
+    <button type="button" id="btn-export">エクスポート</button>
+    <button type="button" id="btn-reset">初期化</button>
+  </div>
+</div>
+
+<div class="container" id="app"></div>
+
+<!-- pair-edit modal -->
+<div class="modal-backdrop" id="modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-labelledby="modal-title-text">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modal-title-text">並記編集</div>
+        <div class="modal-sub" id="modal-sub-text"></div>
+      </div>
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label for="modal-ja">日本語 (JA)</label>
+        <textarea id="modal-ja" spellcheck="false"></textarea>
+      </div>
+      <div class="modal-field">
+        <label for="modal-en">English (EN)</label>
+        <textarea id="modal-en" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="translate-row" style="padding:0 24px 12px">
+      <button type="button" class="btn btn-tl" id="modal-tl-ja2en" title="JA→EN で翻訳">JA → EN 翻訳</button>
+      <button type="button" class="btn btn-tl" id="modal-tl-en2ja" title="EN→JA で翻訳">EN → JA 翻訳</button>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn" id="modal-cancel">キャンセル</button>
+      <button type="button" class="btn btn-primary" id="modal-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Proxy not-configured notice modal (v4) -->
+<div class="modal-backdrop" id="proxy-modal" aria-hidden="true">
+  <div class="modal modal-narrow" role="dialog" aria-labelledby="proxy-modal-title">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="proxy-modal-title">翻訳プロキシが未設定です</div>
+        <div class="modal-sub">Cloudflare Worker のデプロイが必要です</div>
+      </div>
+      <button type="button" class="modal-close" id="proxy-modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body-single">
+      <p>このビューワーは Cloudflare Worker 経由で Anthropic API を呼び出します。APIキーは Worker の Secret として暗号化保管され、ブラウザには保存されません。</p>
+      <p class="small">デプロイ手順: <code>viaduct-translate-proxy/README.md</code>（朝の3コマンドで完了）。デプロイ後、このHTMLの <code>PROXY_ENDPOINT</code> 定数を本番URLに書き換えて再アップロードしてください。</p>
+      <div class="cost-note">💡 並記モーダルの手入力は引き続き可能（翻訳OFFで運用できます）。</div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-primary" id="proxy-modal-ok">了解</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSON-first SSOT -->
+<script type="application/json" id="pmp-data">
+{
+  "meta": {
+    "topic": { "ja": "Viaduct Governance Regulations", "en": "Viaduct Governance Regulations" },
+    "subtitle": { "ja": "Viaduct 規定整備プロジェクト — 40規程のドラフト作成・フォーマット適用・承認取得【On Hold — Accountability Vacuum により作業一時停止中・本社判断待ち】", "en": "Viaduct regulations project — draft, format, and secure approval for 40 corporate rules [On Hold — paused pending HQ decision on Accountability Vacuum]" },
+    "eyebrow": { "ja": "Skill9 · Project & Task Engine · T2 Project · v5", "en": "Skill9 · Project & Task Engine · T2 Project · v5" },
+    "topicSlug": "20260420_P-0321-002_governance-regulations",
+    "projectId": "P-0321-002",
+    "date": "2026-04-20",
+    "start": "2026-03-21",
+    "deadline": "2026-05-31",
+    "tier": "T2",
+    "mode": "predictive",
+    "pm": { "ja": "新垣", "en": "Aragaki" },
+    "sponsor": { "ja": "David (CEO)", "en": "David (CEO)" },
+    "approach": { "ja": "Predictive", "en": "Predictive" }
+  },
+  "tabs": [
+    { "id": "charter",   "num": "01", "label": { "ja": "Charter",   "en": "Charter" } },
+    { "id": "wbs",       "num": "02", "label": { "ja": "WBS",       "en": "WBS" } },
+    { "id": "schedule",  "num": "03", "label": { "ja": "Schedule",  "en": "Schedule" } },
+    { "id": "raci",      "num": "04", "label": { "ja": "RACI",      "en": "RACI" } },
+    { "id": "risk",      "num": "05", "label": { "ja": "Risk",      "en": "Risk" } },
+    { "id": "dashboard", "num": "06", "label": { "ja": "Dashboard", "en": "Dashboard" } }
+  ],
+  "charter": {
+    "title": { "ja": "Project Charter", "en": "Project Charter" },
+    "desc": { "ja": "プロジェクト憲章。PMP T2 12章構成に準拠。目的・スコープ・成功基準・制約条件を定義。", "en": "Project charter per PMP T2 12-chapter standard. Defines purpose, scope, success criteria, and constraints." },
+    "items": [
+      { "id": "purpose", "label": { "ja": "目的と背景", "en": "Purpose & Background" }, "value": { "ja": "Viaduct AI は設立からの急成長に伴い社内規程が未整備。KPMG監査対応・SRIガバナンス基準準拠・取締役会承認基盤の整備が不可欠となっている。40規程を対象にSRI既存規程をベースにViaduct向けにカスタマイズ、Google Doc標準フォーマットを適用、取締役会承認を経て正式運用に移行する。", "en": "Viaduct AI lacks formal internal rules despite rapid growth since founding. KPMG audit, SRI governance alignment, and Board approval foundation are essential. Customize 40 SRI rules for Viaduct, apply standard Google Doc formatting, secure Board approval, and roll into production governance." } },
+      { "id": "in-scope", "label": { "ja": "対象範囲", "en": "In Scope" }, "value": { "ja": "・40規程のドラフト作成（◎15規程の必須 + 〇20規程の優先 + No.11附表1含む）\n・SRIフォーマット適用（GAS Web App `formatRegulation()` 実行）\n・社内レビュー・コメント反映・取締役会承認\n・Overview SS（VIA-BR-001）上での進捗トラッキング", "en": "・Drafting of 40 regulations (15 must-have ◎ + 20 priority 〇 + No.11 Attachment 1)\n・SRI format application (GAS Web App `formatRegulation()`)\n・Internal review, comment resolution, Board approval\n・Progress tracking on Overview SS (VIA-BR-001)" } },
+      { "id": "out-scope", "label": { "ja": "対象外", "en": "Out of Scope" }, "value": { "ja": "・No.63/64（タイヤ事業関連）— Viaduct事業範囲外\n・運用教育・社内周知会 — 別プロジェクトで対応\n・英訳版作成 — Phase 2以降で検討", "en": "・No.63/64 (tire business) — outside Viaduct scope\n・Training & internal rollout — separate project\n・English translations — considered in Phase 2" } },
+      { "id": "success", "label": { "ja": "成功基準", "en": "Success Criteria" }, "value": { "ja": "(1) 40規程のドラフト完了率 100%（現状 34/40 = 85%）\n(2) SRIフォーマット適用率 100%\n(3) 取締役会での承認取得\n(4) KPMG監査で内部統制 Walkthrough 実施可能", "en": "(1) Drafting completion 100% (currently 34/40 = 85%)\n(2) Format application rate 100%\n(3) Board approval secured\n(4) KPMG internal-control walkthrough ready" } },
+      { "id": "deliverables", "label": { "ja": "主要成果物", "en": "Key Deliverables" }, "value": { "ja": "・規程ドラフト Google Doc × 40件\n・Overview SS (ID: 1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA)\n・WS4監査準備 Doc\n・No.11附表1（権限別一覧表）", "en": "・Regulation drafts × 40 Google Docs\n・Overview SS (ID: 1uQuWAEWqoYmZP161m-LdhzRv5VuoaXWClFOMzhQCbeA)\n・WS4 audit preparation Doc\n・No.11 Attachment 1 (authority matrix)" } },
+      { "id": "budget", "label": { "ja": "予算", "en": "Budget" }, "value": { "ja": "人件費のみ。PM 40%稼働 × 2.5ヶ月、サポート 20%稼働。\n外部費用: GAS実行 (無料枠内) / KPMG監査費用は別予算", "en": "Labor only. PM 40% allocation × 2.5 months, support 20%.\nExternal: GAS (free tier) / KPMG audit fees on separate budget" } },
+      { "id": "approach-rationale", "label": { "ja": "Approach", "en": "Approach" }, "value": { "ja": "Predictive（予測型）。成果物（40規程）と完了条件が事前確定、SRI既存規程という過去実績あり、依存関係が固定（ドラフト→フォーマット→レビュー→承認）のため。", "en": "Predictive. Deliverables (40 rules) and acceptance criteria are fixed; SRI provides baseline; dependencies sequential (draft → format → review → approve)." } }
+    ],
+    "priorityTriangle": {
+      "title": { "ja": "制約条件 — Priority Triangle", "en": "Constraints — Priority Triangle" },
+      "cells": [
+        { "id": "scope",   "label": { "ja": "Scope",   "en": "Scope" },   "value": { "ja": "固定", "en": "Fixed" },    "class": "pt-fixed" },
+        { "id": "time",    "label": { "ja": "Time",    "en": "Time" },    "value": { "ja": "固定", "en": "Fixed" },    "class": "pt-fixed" },
+        { "id": "cost",    "label": { "ja": "Cost",    "en": "Cost" },    "value": { "ja": "柔軟", "en": "Flexible" }, "class": "pt-flexible" },
+        { "id": "quality", "label": { "ja": "Quality", "en": "Quality" }, "value": { "ja": "受容", "en": "Accept" },   "class": "pt-accept" }
+      ],
+      "note": { "ja": "40規程全部が必要（KPMG要求）。期限も動かせない（Q2監査準備）。コストは柔軟（人的リソース追加可）。品質は最低ラインを死守。", "en": "All 40 rules required (KPMG demand). Deadline hard (Q2 audit prep). Cost flexible (resources can flex). Quality must clear minimum bar." }
+    }
+  },
+  "wbs": {
+    "title": { "ja": "Work Breakdown Structure", "en": "Work Breakdown Structure" },
+    "desc": { "ja": "Level 1 ワークストリーム（3本）→ Level 2 ワークパッケージ（8本）→ Level 3 主要タスク。クリティカルパスは WS1→WS2→WS3 で直列。", "en": "Level 1 workstreams (×3) → Level 2 work packages (×8) → Level 3 key tasks. Critical path is serial: WS1 → WS2 → WS3." },
+    "workstreams": [
+      {
+        "id": "WS1", "code": "WS1", "name": { "ja": "ドラフト作成", "en": "Drafting" },
+        "packages": [
+          { "id": "1.1", "code": "1.1", "name": { "ja": "◎ 必須規程15件ドラフト", "en": "Must-have regulations (15) draft" }, "due": "2026-04-10", "owner": { "ja": "新垣", "en": "Aragaki" }, "status": "done",
+            "tasks": [
+              { "id": "1.1.1", "code": "1.1.1", "name": { "ja": "SRI原本取り込み・差分分析", "en": "Import SRI originals, diff analysis" }, "due": "2026-03-28", "owner": "Aragaki", "status": "done" },
+              { "id": "1.1.2", "code": "1.1.2", "name": { "ja": "Viaductカスタマイズ（会社名・役職・金額基準）", "en": "Viaduct customization (name, roles, thresholds)" }, "due": "2026-04-10", "owner": "Aragaki", "status": "done" }
+            ]
+          },
+          { "id": "1.2", "code": "1.2", "name": { "ja": "〇 優先規程20件ドラフト", "en": "Priority regulations (20) draft" }, "due": "2026-04-25", "owner": "Aragaki", "status": "inprog",
+            "tasks": [
+              { "id": "1.2.1", "code": "1.2.1", "name": { "ja": "19件完了（34件中 15+19）", "en": "19 completed (15+19 out of 34 total)" }, "due": "2026-04-18", "owner": "Aragaki", "status": "done" },
+              { "id": "1.2.2", "code": "1.2.2", "name": { "ja": "残6件ドラフト（40 − 34）", "en": "Remaining 6 drafts (40 − 34)" }, "due": "2026-04-25", "owner": "Aragaki", "status": "inprog" }
+            ]
+          },
+          { "id": "1.3", "code": "1.3", "name": { "ja": "No.11附表1（権限別一覧表）", "en": "No.11 Attachment 1 (authority matrix)" }, "due": "2026-04-22", "owner": "Aragaki", "status": "blocked",
+            "tasks": [
+              { "id": "1.3.1", "code": "1.3.1", "name": { "ja": "権限閾値のCEO決裁取得", "en": "Secure CEO decision on authority thresholds" }, "due": "2026-04-22", "owner": "David", "status": "blocked" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "WS2", "code": "WS2", "name": { "ja": "フォーマット適用", "en": "Format Application" },
+        "packages": [
+          { "id": "2.1", "code": "2.1", "name": { "ja": "GAS Web App `formatRegulation()` 実行", "en": "Run GAS Web App `formatRegulation()`" }, "due": "2026-05-02", "owner": "Aragaki", "status": "inprog",
+            "tasks": [
+              { "id": "2.1.1", "code": "2.1.1", "name": { "ja": "20件適用済", "en": "20 already applied" }, "due": "2026-04-18", "owner": "Aragaki", "status": "done" },
+              { "id": "2.1.2", "code": "2.1.2", "name": { "ja": "残20件（◎5+〇15 推定）", "en": "Remaining 20 (5 ◎ + 15 〇 estimated)" }, "due": "2026-05-02", "owner": "Aragaki", "status": "todo", "estimated": true }
+            ]
+          },
+          { "id": "2.2", "code": "2.2", "name": { "ja": "QA チェックリスト適用", "en": "QA checklist application" }, "due": "2026-05-06", "owner": "Aragaki", "status": "todo", "tasks": [] }
+        ]
+      },
+      {
+        "id": "WS3", "code": "WS3", "name": { "ja": "レビュー・承認", "en": "Review & Approval" },
+        "packages": [
+          { "id": "3.1", "code": "3.1", "name": { "ja": "Shige（Viaduct CFO）レビュー", "en": "Shige (Viaduct CFO) review" }, "due": "2026-05-15", "owner": "Shigematsu", "status": "todo", "tasks": [] },
+          { "id": "3.2", "code": "3.2", "name": { "ja": "KPMG事前コメント反映", "en": "KPMG pre-review comments" }, "due": "2026-05-22", "owner": "Aragaki", "status": "todo", "tasks": [] },
+          { "id": "3.3", "code": "3.3", "name": { "ja": "取締役会承認", "en": "Board approval" }, "due": "2026-05-31", "owner": "David", "status": "todo", "tasks": [] }
+        ]
+      }
+    ]
+  },
+  "schedule": {
+    "title": { "ja": "Schedule & Critical Path", "en": "Schedule & Critical Path" },
+    "desc": { "ja": "Mar 21 〜 May 31 の10週間。赤線＝クリティカルパス（WS1.2 → WS1.3 → WS2.1 → WS3.1 → WS3.3）。◆＝マイルストーン。", "en": "Mar 21 – May 31 (10 weeks). Red bars = critical path (WS1.2 → WS1.3 → WS2.1 → WS3.1 → WS3.3). ◆ = milestones." },
+    "startDate": "2026-03-21",
+    "endDate": "2026-05-31",
+    "today": "2026-04-20",
+    "rows": [
+      { "id": "1.1", "label": { "ja": "1.1 必須15件", "en": "1.1 Must-have ×15" }, "start": "2026-03-21", "end": "2026-04-10", "status": "done", "critical": false, "progress": 1.0, "note": { "ja": "DONE · 13/15 CXO Ready", "en": "DONE · 13/15 CXO Ready" } },
+      { "id": "1.2", "label": { "ja": "1.2 優先20件", "en": "1.2 Priority ×20" }, "start": "2026-03-28", "end": "2026-04-25", "status": "done", "critical": false, "progress": 1.0, "note": { "ja": "Draft完了 · 20/20 · QA Fix 7件済", "en": "Drafts complete · 20/20 · QA Fix 7 done" } },
+      { "id": "1.3", "label": { "ja": "1.3 No.11附表1", "en": "1.3 No.11 Att.1" }, "start": "2026-04-11", "end": "2026-04-25", "status": "blocked", "critical": true, "progress": 0.0, "note": { "ja": "ブロック · CEO決裁待ち", "en": "BLOCKED · CEO decision pending" } },
+      { "id": "2.1", "label": { "ja": "2.1 フォーマット適用", "en": "2.1 Format apply" }, "start": "2026-04-11", "end": "2026-05-02", "status": "blocked", "critical": true, "progress": 0.5, "note": { "ja": "一時停止 · 20/40", "en": "PAUSED · 20 of 40 done" } },
+      { "id": "2.2", "label": { "ja": "2.2 QAチェック", "en": "2.2 QA checklist" }, "start": "2026-05-02", "end": "2026-05-06", "status": "todo", "critical": false, "progress": 0.0, "note": { "ja": "", "en": "" } },
+      { "id": "3.1", "label": { "ja": "3.1 CFO/COOレビュー", "en": "3.1 CFO/COO review" }, "start": "2026-05-06", "end": "2026-05-15", "status": "blocked", "critical": true, "progress": 0.0, "note": { "ja": "BlockedBy Matej役割確定", "en": "Blocked by Matej role clarity" } },
+      { "id": "3.2", "label": { "ja": "3.2 KPMGコメント", "en": "3.2 KPMG comments" }, "start": "2026-05-15", "end": "2026-05-22", "status": "todo", "critical": false, "progress": 0.0, "note": { "ja": "", "en": "" } },
+      { "id": "3.3", "label": { "ja": "3.3 取締役会承認", "en": "3.3 Board approval" }, "start": "2026-05-22", "end": "2026-05-31", "status": "todo", "critical": true, "progress": 0.0, "note": { "ja": "", "en": "" } }
+    ],
+    "milestones": [
+      { "id": "M1", "date": "2026-04-25", "name": { "ja": "全40規程ドラフト完了", "en": "All 40 drafts complete" }, "owner": "Aragaki", "status": "inprog" },
+      { "id": "M2", "date": "2026-05-06", "name": { "ja": "フォーマット適用・QA完了", "en": "Format & QA complete" }, "owner": "Aragaki", "status": "todo" },
+      { "id": "M2.5", "date": "2026-05-15", "name": { "ja": "Shige / KPMG レビュー完了", "en": "Shige / KPMG review complete" }, "owner": "Shigematsu", "status": "todo" },
+      { "id": "M3", "date": "2026-05-31", "name": { "ja": "取締役会承認・正式運用開始", "en": "Board approved & live" }, "owner": "David", "status": "todo" }
+    ],
+    "legend": {
+      "done":     { "ja": "完了",            "en": "Done" },
+      "inprog":   { "ja": "進行中",          "en": "In Progress" },
+      "todo":     { "ja": "未着手",          "en": "To Do" },
+      "blocked":  { "ja": "ブロック",        "en": "Blocked" },
+      "critical": { "ja": "クリティカル境界", "en": "Critical Path" },
+      "milestone":{ "ja": "マイルストーン",   "en": "Milestone" }
+    }
+  },
+  "raci": {
+    "title": { "ja": "RACI Matrix", "en": "RACI Matrix" },
+    "desc": { "ja": "主要ワークパッケージ × ステークホルダー。R=実行、A=承認、C=相談、I=報告。A は各行1名のみ（PMP原則）。", "en": "Work packages × stakeholders. R=Responsible, A=Accountable, C=Consulted, I=Informed. Only one A per row (PMP principle)." },
+    "roles": [
+      { "id": "pm",    "name": { "ja": "新垣\n(PM)",        "en": "Aragaki\n(PM)" } },
+      { "id": "ceo",   "name": { "ja": "David\n(CEO)",      "en": "David\n(CEO)" } },
+      { "id": "cfo",   "name": { "ja": "Shige\n(Viaduct CFO)", "en": "Shige\n(Viaduct CFO)" } },
+      { "id": "kpmg",  "name": { "ja": "KPMG",              "en": "KPMG" } },
+      { "id": "board", "name": { "ja": "取締役会",           "en": "Board" } }
+    ],
+    "tasks": [
+      { "id": "1.1", "name": { "ja": "1.1 必須15規程ドラフト", "en": "1.1 Must-have drafts" }, "assignments": { "pm": "R,A", "ceo": "I", "cfo": "C", "kpmg": "-", "board": "I" } },
+      { "id": "1.2", "name": { "ja": "1.2 優先20規程ドラフト", "en": "1.2 Priority drafts" }, "assignments": { "pm": "R,A", "ceo": "I", "cfo": "C", "kpmg": "-", "board": "-" } },
+      { "id": "1.3", "name": { "ja": "1.3 No.11附表1 権限決裁", "en": "1.3 No.11 Att.1 authority" }, "assignments": { "pm": "R", "ceo": "A", "cfo": "C", "kpmg": "-", "board": "I" } },
+      { "id": "2.1", "name": { "ja": "2.1 フォーマット適用", "en": "2.1 Format apply" }, "assignments": { "pm": "R,A", "ceo": "-", "cfo": "I", "kpmg": "-", "board": "-" } },
+      { "id": "2.2", "name": { "ja": "2.2 QAチェック", "en": "2.2 QA checklist" }, "assignments": { "pm": "R,A", "ceo": "-", "cfo": "C", "kpmg": "I", "board": "-" } },
+      { "id": "3.1", "name": { "ja": "3.1 Shigeレビュー", "en": "3.1 Shige review" }, "assignments": { "pm": "I", "ceo": "-", "cfo": "R,A", "kpmg": "-", "board": "-" } },
+      { "id": "3.2", "name": { "ja": "3.2 KPMG事前レビュー", "en": "3.2 KPMG pre-review" }, "assignments": { "pm": "R", "ceo": "I", "cfo": "C", "kpmg": "A", "board": "-" } },
+      { "id": "3.3", "name": { "ja": "3.3 取締役会承認", "en": "3.3 Board approval" }, "assignments": { "pm": "R", "ceo": "C", "cfo": "C", "kpmg": "I", "board": "A" } }
+    ],
+    "commsTitle": { "ja": "ステークホルダー・コミュニケーション計画", "en": "Stakeholder Communication Plan" },
+    "comms": [
+      { "id": "c1", "name": { "ja": "David (CEO)",          "en": "David (CEO)" },          "body": { "ja": "頻度: 週次 / チャネル: 1:1会議 + Slack DM / 内容: 進捗率・ブロッカー（特にNo.11附表1の権限決裁）", "en": "Cadence: weekly · Channel: 1:1 + Slack DM · Content: progress %, blockers (esp. No.11 Att.1 authority decision)" } },
+      { "id": "c2", "name": { "ja": "Shige (Viaduct CFO)", "en": "Shige (Viaduct CFO)" }, "body": { "ja": "頻度: ドラフト完成時 / チャネル: Slack + Google Docコメント / 内容: 財務規程を中心にレビュー",         "en": "Cadence: on draft completion · Channel: Slack + Doc comments · Content: focus on finance regulations" } },
+      { "id": "c3", "name": { "ja": "KPMG",                "en": "KPMG" },                "body": { "ja": "頻度: 月1回 / チャネル: メール + 監査ミーティング / 内容: Walkthrough準備状況",                       "en": "Cadence: monthly · Channel: email + audit meeting · Content: walkthrough readiness" } },
+      { "id": "c4", "name": { "ja": "取締役会",             "en": "Board" },               "body": { "ja": "頻度: M3直前 / チャネル: 取締役会資料 / 内容: 40規程一括承認決議",                                     "en": "Cadence: just before M3 · Channel: Board deck · Content: single-resolution approval of all 40" } }
+    ]
+  },
+  "risks": {
+    "title": { "ja": "Risk Register", "en": "Risk Register" },
+    "desc": { "ja": "Risk 4型（回避／低減／移転／保有）で対応戦略を分類。確率×影響ヒートマップで優先度を可視化。", "en": "Response strategies classified into 4 types (Avoid / Mitigate / Transfer / Accept). Probability × Impact heatmap shows priority." },
+    "heatmapTitle": { "ja": "確率 × 影響 ヒートマップ", "en": "Probability × Impact Heatmap" },
+    "items": [
+      { "id": "R1", "risk":  { "ja": "No.11附表1の権限閾値 CEO決裁が遅延し、M1を阻害",  "en": "No.11 Att.1 authority threshold CEO decision delays M1" },        "p": "H", "i": "H", "strategy": "mitigate", "strategyLabel": { "ja": "低減", "en": "Mitigate" }, "response": { "ja": "SRI現行閾値を暫定値とし「v0.9」で進める。CEO承認後v1.0に改定。トリガー: 4/22時点で未決裁", "en": "Use SRI current thresholds as interim v0.9. Revise to v1.0 post-CEO approval. Trigger: unresolved by 4/22" } },
+      { "id": "R2", "risk":  { "ja": "Shigeのレビュー工数不足（本業クローズ業務と重複）", "en": "Shige review bandwidth insufficient (monthly close overlap)" },       "p": "M", "i": "H", "strategy": "avoid",    "strategyLabel": { "ja": "回避", "en": "Avoid" },    "response": { "ja": "レビューを2バッチ（財務系/その他）に分割、5月第1週に先行依頼。月次クローズ期間（5/5-10）を避ける", "en": "Split review in 2 batches (finance / others), front-load in week 1 of May. Avoid close period (5/5-10)" } },
+      { "id": "R3", "risk":  { "ja": "KPMGから内部統制 Walkthrough 追加要求",              "en": "KPMG requests additional walkthrough items" },                      "p": "M", "i": "M", "strategy": "transfer", "strategyLabel": { "ja": "移転", "en": "Transfer" }, "response": { "ja": "KPMG要求はWS4監査準備Docに切り出し、別プロジェクト化。P-0321-002スコープ外に移す。トリガー: 要求受領時", "en": "Carve out into WS4 audit prep Doc as a separate project; push outside P-0321-002 scope. Trigger: on request receipt" } },
+      { "id": "R4", "risk":  { "ja": "GAS Web App の不具合で大量フォーマット適用に失敗",   "en": "GAS Web App fails on bulk format apply" },                          "p": "L", "i": "H", "strategy": "mitigate", "strategyLabel": { "ja": "低減", "en": "Mitigate" }, "response": { "ja": "バッチサイズ5件以下で逐次実行、失敗時は手動適用にフォールバック。事前に2件で動作検証", "en": "Run batches of ≤5, fall back to manual. Verify with 2-item smoke test beforehand" } },
+      { "id": "R5", "risk":  { "ja": "取締役会日程が5/31以降にスリップ",                   "en": "Board meeting slips past 5/31" },                                   "p": "L", "i": "M", "strategy": "accept",   "strategyLabel": { "ja": "保有", "en": "Accept" },   "response": { "ja": "CEO/Board Secの権限外。発生時は持ち回り決議を提案、遅延はKPMGに事前通知", "en": "Outside CEO/Board Sec control. On occurrence: propose written resolution, notify KPMG in advance" } },
+      { "id": "R6", "risk":  { "ja": "規程相互の矛盾（権限規程 vs 経費規程など）",         "en": "Cross-regulation conflicts (authority vs expense, etc.)" },         "p": "M", "i": "M", "strategy": "mitigate", "strategyLabel": { "ja": "低減", "en": "Mitigate" }, "response": { "ja": "QA（WS2.2）で金額・権限・期間の相互参照チェックリスト実施。Overview SSで相互参照表を作成", "en": "QA (WS2.2) cross-reference check for amounts / authority / tenor. Build cross-ref table on Overview SS" } }
+    ]
+  },
+  "dashboard": {
+    "title": { "ja": "Progress Dashboard", "en": "Progress Dashboard" },
+    "desc": { "ja": "2026-04-18 時点のサマリ。バーンダウン・KPI・主要リスクシグナル・次のアクション。", "en": "Snapshot as of 2026-04-18: burndown, KPIs, top risk signals, next actions." },
+    "kpis": [
+      { "id": "drafts", "label": { "ja": "ドラフト完了率",  "en": "Draft Completion" }, "value": 85, "unit": "%",  "sub": { "ja": "34 / 40 (N/A 2件除く)", "en": "34 / 40 (excl. N/A 2)" } },
+      { "id": "cxo",    "label": { "ja": "CXOレビュー完了", "en": "CXO Review Done" },  "value":  0, "unit": "%",  "sub": { "ja": "0 / 15 ◎ · 配布未実施", "en": "0 / 15 ◎ · not yet distributed" } },
+      { "id": "overall","label": { "ja": "全体進捗",       "en": "Overall Progress" }, "value": 55, "unit": "%",  "sub": { "ja": "WS1 95% · WS2 50% · WS3 0%", "en": "WS1 95% · WS2 50% · WS3 0%" } },
+      { "id": "days",   "label": { "ja": "残日数",          "en": "Days to M3" },       "value": 41, "unit": "",   "sub": { "ja": "2026-05-31 まで", "en": "until 2026-05-31" } }
+    ],
+    "burndown": [
+      { "date": "2026-03-21", "planned": 40, "actual": 40 },
+      { "date": "2026-04-04", "planned": 32, "actual": 25 },
+      { "date": "2026-04-11", "planned": 28, "actual": 20 },
+      { "date": "2026-04-18", "planned": 24, "actual":  6 },
+      { "date": "2026-04-20", "planned": 22, "actual":  6 },
+      { "date": "2026-05-02", "planned": 16, "actual": null, "forecast":  6 },
+      { "date": "2026-05-16", "planned":  8, "actual": null, "forecast":  4 },
+      { "date": "2026-05-31", "planned":  0, "actual": null, "forecast":  2 }
+    ],
+    "burndownNote": { "ja": "実線＝実績 / 破線＝予測。4/20 Accountability Vacuum により作業停止 → 予測線が計画線から乖離。Matej COO役割確定まで停滞想定。", "en": "Solid = actual / Dashed = forecast. Paused 4/20 due to Accountability Vacuum → forecast diverges from plan. Expected flat until Matej COO role clarified." },
+    "signalsTitle": { "ja": "アラート・シグナル", "en": "Alerts & Signals" },
+    "signals": [
+      { "id": "s1", "type": "blocked", "badge": { "ja": "CRITICAL", "en": "CRITICAL" }, "title": { "ja": "Accountability Vacuum — 作業一時停止", "en": "Accountability Vacuum — work paused" }, "body":  { "ja": "4/20 Shige打合せで確認: MatejにCOO/ガバナンスオーナーの認識欠如。新垣は意図的に作業停止中。打開策: ShigeがHiroaki Kawasaki（SRI本社部長格）に相談し本社ルートでMatejにCOO役割を明示的に落とす。KPMGが来年SRI基準監査要求見込みで時間的余裕なし。", "en": "Confirmed 4/20 with Shige: Matej lacks COO/governance-owner awareness. Gaki intentionally paused. Path: Shige to consult Hiroaki Kawasaki (SRI HQ dept head) to land COO role on Matej via HQ route. KPMG expected to require SRI-standard audit next year — limited runway." } },
+      { "id": "s2", "type": "blocked", "badge": { "ja": "OVERDUE", "en": "OVERDUE" }, "title": { "ja": "T-0324-G05 ◎規程レビュー配布 超過13日", "en": "T-0324-G05 ◎ Review Distribution overdue 13 days" }, "body":  { "ja": "予定4/7 → Matej COO役割確定まで着手不能。Hiroakiルート結論が出た時点で即再開可能な状態で保持。", "en": "Planned 4/7 → cannot proceed until Matej COO role confirmed. Held in ready state for immediate restart upon HQ route conclusion." } },
+      { "id": "s3", "type": "risk",    "badge": { "ja": "AT RISK", "en": "AT RISK" }, "title": { "ja": "T-0324-G10 CEO承認日程確保 Due 4/30",      "en": "T-0324-G10 CEO approval scheduling Due 4/30" },            "body":  { "ja": "Davidへの◎15件バルク承認セッション調整がMatej経由。COO役割確定後即着手を予定。", "en": "David's ◎ bulk approval session routes through Matej. Will kick off immediately after COO role is clear." } },
+      { "id": "s4", "type": "risk",    "badge": { "ja": "EXTERNAL", "en": "EXTERNAL" }, "title": { "ja": "KPMG SRI基準監査 前倒し見込み (FY2027)", "en": "KPMG SRI-standard audit earlier than expected (FY2027)" },             "body":  { "ja": "このタイムラインに合わせて本社判断が必要。放置すればSRI監査と同時にViaduct独立監査の準備遅延が発生。", "en": "HQ decision must align with this horizon. Delay risks simultaneous SRI audit + delayed independent Viaduct audit prep." } },
+      { "id": "s5", "type": "ok",      "badge": { "ja": "READY", "en": "READY" }, "title": { "ja": "34規程ドラフト完了・QA Fix済 7件", "en": "34 drafts complete · 7 QA fixes done" }, "body":  { "ja": "再開次第 T-0324-G05 から直ちに配布可能な状態。", "en": "Ready for immediate distribution via T-0324-G05 on restart." } }
+    ],
+    "actionsTitle": { "ja": "次のアクション（Top 3）", "en": "Next Actions (Top 3)" },
+    "actions": [
+      { "id": "a1", "title": { "ja": "Shige → Hiroaki相談", "en": "Shige → Hiroaki consultation" },   "body": { "ja": "期限: 2026-04-21以降 / 担当: Shige / 本社ルートでMatejにCOO役割明示依頼", "en": "Due from 2026-04-21 · Owner: Shige · Ask HQ route to land COO role on Matej" } },
+      { "id": "a2", "title": { "ja": "本社判断待ち",         "en": "Await HQ decision" },       "body": { "ja": "期限: 4月末目標 / KPMG前倒し見込みを材料に本社決断",           "en": "Target end-April · Use KPMG timeline as lever for HQ decision" } },
+      { "id": "a3", "title": { "ja": "新垣作業再開 → T-0324-G05から",   "en": "Gaki resumes work → start with T-0324-G05" },      "body": { "ja": "Matej役割確定次第 / ◎15件配布から即座に再開", "en": "On Matej role confirmation · Restart with ◎15 distribution immediately" } }
+    ]
+  },
+  "footer": {
+    "left":  { "ja": "Skill9 · Project & Task Engine · PMP T2 · 生成 2026-04-20 · P-0321-002 · v5 (Shige打合せ反映・Accountability Vacuum明示)", "en": "Skill9 · Project & Task Engine · PMP T2 · Generated 2026-04-20 · P-0321-002 · v5 (Shige meeting reflected · Accountability Vacuum exposed)" },
+    "right": { "ja": "Tabs 1–6 · Print Ctrl+P · Lang L · Edit E · Translate T · Save Ctrl+S", "en": "Tabs 1–6 · Print Ctrl+P · Lang L · Edit E · Translate T · Save Ctrl+S" }
+  }
+}
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  // ---------- v4: Cloudflare Worker translation proxy ----------
+  // Replace the placeholder below with the deployed Worker URL after
+  // running `wrangler deploy` on the viaduct-translate-proxy project.
+  const PROXY_ENDPOINT = 'https://REPLACE-AFTER-DEPLOY.workers.dev';
+  const TRANSLATE_CONTEXT = 'pmp';
+
+  const LS_KEY_DATA  = 'skill9-v4-edits';
+  const LS_KEY_LANG  = 'skill9-v4-lang';
+  const LS_KEY_TIMES = 'skill9-v4-edit-times';
+  const LS_KEY_TL_ENABLED= 'skill9-v4-translate-enabled';
+  const LS_KEY_TL_CACHE  = 'skill9-v4-translations';
+  const API_TIMEOUT_MS = 15000;
+
+  function isProxyConfigured(){ return PROXY_ENDPOINT && !/REPLACE-AFTER-DEPLOY/.test(PROXY_ENDPOINT); }
+
+  // ---------- Data loading ----------
+  const initialData = JSON.parse(document.getElementById('pmp-data').textContent);
+  const topicSlug   = (initialData.meta && initialData.meta.topicSlug) || 'default';
+  const storageKey  = LS_KEY_DATA + '-' + topicSlug;
+  let data      = loadData();
+  let editTimes = loadEditTimes();
+
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(storageKey);
+      if(raw){
+        return mergeData(deepClone(initialData), JSON.parse(raw));
+      }
+    }catch(_){}
+    return deepClone(initialData);
+  }
+  function mergeData(base, overlay){
+    if(overlay===null||overlay===undefined) return base;
+    if(typeof overlay!=='object' || Array.isArray(overlay)) return overlay;
+    const out = Array.isArray(base) ? base.slice() : Object.assign({}, base);
+    for(const k of Object.keys(overlay)){
+      out[k] = mergeData(base ? base[k] : undefined, overlay[k]);
+    }
+    return out;
+  }
+  function saveData(){
+    try{
+      localStorage.setItem(storageKey, JSON.stringify(data));
+      localStorage.setItem(LS_KEY_TIMES + '-' + topicSlug, JSON.stringify(editTimes));
+      updateStatusChip();
+    }catch(e){ console.warn('saveData failed', e); }
+  }
+  function loadEditTimes(){
+    try{
+      const raw = localStorage.getItem(LS_KEY_TIMES + '-' + topicSlug);
+      if(raw) return JSON.parse(raw);
+    }catch(_){}
+    return {};
+  }
+
+  // ---------- Path helpers ----------
+  function getByPath(root, path){
+    let cur = root;
+    for(const seg of path){
+      if(cur==null) return undefined;
+      cur = cur[seg];
+    }
+    return cur;
+  }
+  function setByPath(root, path, value){
+    let cur = root;
+    for(let i=0;i<path.length-1;i++){
+      if(cur[path[i]]==null) cur[path[i]] = {};
+      cur = cur[path[i]];
+    }
+    cur[path[path.length-1]] = value;
+  }
+
+  // ---------- State ----------
+  let currentLang = (function(){
+    try{ const s = localStorage.getItem(LS_KEY_LANG); if(s==='ja'||s==='en') return s; }catch(_){}
+    return 'ja';
+  })();
+  let currentTab = 0;
+  let editMode = false;
+
+  // ---------- Helpers ----------
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
+
+  function i18nSpan(path, opts){
+    opts = opts || {};
+    const val = getPairValue(path);
+    const jaMissing = !val.ja || !String(val.ja).trim();
+    const enMissing = !val.en || !String(val.en).trim();
+    const missing = jaMissing || enMissing;
+    const cls = ['editable','editable-pair'];
+    if(opts.noPair) cls.length = 0, cls.push('editable');
+    if(missing) cls.push('missing-lang');
+    const edited = editTimes[path];
+    const text = currentLang==='ja' ? (val.ja||val.en||'') : (val.en||val.ja||'');
+    const content = opts.multiline ? nl2br(text) : esc(text);
+    const tag = opts.tag || 'span';
+    const extraAttrs = opts.attrs || '';
+    const title = edited ? ` title="最終編集: ${esc(edited)}"` : '';
+    let inner = content;
+    if(!opts.noPair){
+      inner += `<button type="button" class="pair-edit-btn" data-pair-btn="${esc(path)}" aria-label="Edit pair">&#x21C4;</button>`;
+      inner += `<span class="lang-warn" aria-label="未翻訳"></span>`;
+    }
+    inner += `<span class="tl-spinner" aria-hidden="true"></span>`;
+    inner += `<span class="tl-flash" aria-hidden="true"></span>`;
+    if(edited){
+      inner += `<span class="edit-marker" aria-label="Edited"></span>`;
+    }
+    return `<${tag} class="${cls.join(' ')}" data-i18n-path="${esc(path)}" data-field="${opts.field||'text'}"${title} ${extraAttrs}>${inner}</${tag}>`;
+  }
+  function getPairValue(path){
+    const node = getByPath(data, path.split('.'));
+    if(node && typeof node==='object' && ('ja' in node || 'en' in node)){
+      return { ja: node.ja||'', en: node.en||'' };
+    }
+    if(typeof node === 'string'){ return { ja: node, en: node }; }
+    return { ja:'', en:'' };
+  }
+  function setPairValue(path, ja, en){
+    setByPath(data, path.split('.'), { ja: ja, en: en });
+    editTimes[path] = new Date().toISOString();
+  }
+  function pickLang(pair){
+    if(pair==null) return '';
+    if(typeof pair==='string') return pair;
+    return pair[currentLang] || pair.ja || pair.en || '';
+  }
+
+  // ---------- Renderers ----------
+  function render(){
+    const app = document.getElementById('app');
+    app.innerHTML = [
+      renderHero(),
+      renderTabs(),
+      renderPanels(),
+      renderFooter()
+    ].join('');
+    activateTab(currentTab);
+    attachDynamicListeners();
+    updateStatusChip();
+  }
+
+  function renderHero(){
+    const m = data.meta;
+    return `
+    <header class="hero">
+      <div class="eyebrow">${i18nSpan('meta.eyebrow')}</div>
+      <h1 class="title">${i18nSpan('meta.topic')}</h1>
+      <div class="subtitle">${i18nSpan('meta.subtitle')}</div>
+      <div class="meta-row">
+        <div class="meta-item"><strong>Project ID</strong> ${esc(m.projectId)}</div>
+        <div class="meta-item"><strong>${currentLang==='ja'?'開始':'Start'}</strong> ${esc(m.start)}</div>
+        <div class="meta-item"><strong>${currentLang==='ja'?'目標完了':'Target'}</strong> ${esc(m.deadline)}</div>
+        <div class="meta-item"><strong>${currentLang==='ja'?'スポンサー':'Sponsor'}</strong> ${i18nSpan('meta.sponsor',{noPair:true})}</div>
+        <div class="meta-item"><strong>PM</strong> ${i18nSpan('meta.pm',{noPair:true})}</div>
+        <div class="meta-item"><strong>${currentLang==='ja'?'アプローチ':'Approach'}</strong> ${i18nSpan('meta.approach',{noPair:true})}</div>
+        <div class="meta-item"><span class="badge badge-t2">${esc((m.tier||'').toUpperCase())} PROJECT</span></div>
+        <div class="meta-item"><span class="badge badge-mode">${esc((m.mode||'').toUpperCase())}</span></div>
+        <div class="meta-item"><span class="badge badge-v3">v3 · LLM translate</span></div>
+      </div>
+    </header>`;
+  }
+
+  function renderTabs(){
+    return `<nav class="tabs" role="tablist">${data.tabs.map((t,i)=>`
+      <button class="tab-btn${i===currentTab?' active':''}" data-tab="${i}">
+        <span class="tab-num">${esc(t.num)}</span>${i18nSpan('tabs.'+i+'.label',{noPair:true})}
+      </button>`).join('')}</nav>`;
+  }
+
+  function renderPanels(){
+    return [
+      renderCharter(),
+      renderWbs(),
+      renderSchedule(),
+      renderRaci(),
+      renderRisk(),
+      renderDashboard()
+    ].join('');
+  }
+
+  // ---- TAB 1: Charter ----
+  function renderCharter(){
+    const c = data.charter;
+    const itemRows = c.items.map((it,i)=>`
+      <tr>
+        <td class="key">${i18nSpan('charter.items.'+i+'.label',{noPair:true})}</td>
+        <td class="val">${i18nSpan('charter.items.'+i+'.value',{multiline:true})}</td>
+      </tr>`).join('');
+    const ptCells = c.priorityTriangle.cells.map((cell,i)=>`
+      <div class="pt-cell ${esc(cell.class)}">
+        <div class="pt-label">${esc(cell.label[currentLang]||cell.label.ja)}</div>
+        <div class="pt-val">${i18nSpan('charter.priorityTriangle.cells.'+i+'.value',{noPair:true})}</div>
+      </div>`).join('');
+    const ptRow = `
+      <tr>
+        <td class="key">${i18nSpan('charter.priorityTriangle.title',{noPair:true})}</td>
+        <td class="val">
+          <div class="priority-triangle">${ptCells}</div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text-muted)">${i18nSpan('charter.priorityTriangle.note',{multiline:true})}</div>
+        </td>
+      </tr>`;
+    return `<section class="panel${currentTab===0?' active':''}" data-panel="0">
+      <div class="panel-title">${i18nSpan('charter.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('charter.desc')}</div>
+      <table class="charter-table"><tbody>${itemRows}${ptRow}</tbody></table>
+    </section>`;
+  }
+
+  // ---- TAB 2: WBS ----
+  function renderWbs(){
+    const w = data.wbs;
+    const rows = [];
+    w.workstreams.forEach((ws, wi)=>{
+      rows.push(`<tr class="wbs-l1"><td>${esc(ws.code)}</td><td colspan="4">${i18nSpan('wbs.workstreams.'+wi+'.name',{noPair:true})}</td></tr>`);
+      ws.packages.forEach((pk, pi)=>{
+        rows.push(`
+          <tr class="wbs-l2">
+            <td class="wbs-code">${esc(pk.code)}</td>
+            <td>${i18nSpan('wbs.workstreams.'+wi+'.packages.'+pi+'.name')}</td>
+            <td>${esc(pk.due)}</td>
+            <td class="col-owner">${esc(pickLang(pk.owner))}</td>
+            <td><span class="wbs-status status-${esc(pk.status)}">${statusLabel(pk.status)}</span></td>
+          </tr>`);
+        (pk.tasks||[]).forEach((t, ti)=>{
+          const estBadge = t.estimated ? ` <span class="badge badge-est">Est</span>` : '';
+          rows.push(`
+            <tr class="wbs-l3">
+              <td class="wbs-code">${esc(t.code)}</td>
+              <td>${i18nSpan('wbs.workstreams.'+wi+'.packages.'+pi+'.tasks.'+ti+'.name')}${estBadge}</td>
+              <td>${esc(t.due)}</td>
+              <td class="col-owner">${esc(pickLang(t.owner))}</td>
+              <td><span class="wbs-status status-${esc(t.status)}">${statusLabel(t.status)}</span></td>
+            </tr>`);
+        });
+      });
+    });
+    return `<section class="panel${currentTab===1?' active':''}" data-panel="1">
+      <div class="panel-title">${i18nSpan('wbs.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('wbs.desc')}</div>
+      <table class="wbs-table">
+        <thead><tr>
+          <th style="width:14%">Code</th>
+          <th>Work Package</th>
+          <th class="col-medium">${currentLang==='ja'?'期限':'Due'}</th>
+          <th class="col-owner">${currentLang==='ja'?'担当':'Owner'}</th>
+          <th class="col-narrow">Status</th>
+        </tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    </section>`;
+  }
+  function statusLabel(s){
+    const map = { done:{ja:'Done',en:'Done'}, inprog:{ja:'In Prog',en:'In Prog'}, todo:{ja:'To Do',en:'To Do'}, blocked:{ja:'Blocked',en:'Blocked'} };
+    return esc((map[s]||{ja:s,en:s})[currentLang]);
+  }
+
+  // ---- TAB 3: Schedule (SVG Gantt) ----
+  function renderSchedule(){
+    const s = data.schedule;
+    const startMs = Date.parse(s.startDate);
+    const endMs   = Date.parse(s.endDate);
+    const totalMs = endMs - startMs;
+    const chartX  = 200, chartW = 900;                 // svg chart area
+    const rowH    = 32, rowY0 = 60;
+    const chartBottom = rowY0 + s.rows.length*rowH + 20;
+
+    function xFromDate(d){ return chartX + (Date.parse(d)-startMs) / totalMs * chartW; }
+
+    // Week grid headers (every 7 days)
+    const weekTicks = [];
+    const weekGrid  = [];
+    const oneWeek = 7*86400000;
+    for(let ms=startMs; ms<=endMs; ms+=oneWeek){
+      const x = xFromDate(new Date(ms).toISOString().slice(0,10));
+      const d = new Date(ms);
+      const lbl = (d.getUTCMonth()+1).toString().padStart(2,'0')+'/'+d.getUTCDate().toString().padStart(2,'0');
+      weekTicks.push(`<text x="${x}" y="24" font-size="10" fill="#9A9A9A">${lbl}</text>`);
+      weekGrid.push(`<line x1="${x}" y1="40" x2="${x}" y2="${chartBottom}" stroke="#E8E8E8" stroke-width="0.5"/>`);
+    }
+
+    // Today line
+    const todayX = xFromDate(s.today);
+    const todayLbl = `TODAY ${s.today.slice(5).replace('-','/')}`;
+
+    // Rows
+    const statusColor = { done:'#2EAE5F', inprog:'#4A90D9', todo:'#9A9A9A', blocked:'#E46962' };
+    const rowsSvg = s.rows.map((r, i)=>{
+      const y = rowY0 + i*rowH;
+      const x1 = xFromDate(r.start);
+      const x2 = xFromDate(r.end);
+      const w  = Math.max(10, x2-x1);
+      const criticalDot = r.critical ? `<tspan fill="#E46962" font-weight="600"> ●</tspan>` : '';
+      const noteText = pickLang(r.note);
+      const labelText = pickLang(r.label);
+      // bar
+      let bar;
+      if(r.status==='inprog' && r.progress>0 && r.progress<1){
+        // partial fill
+        const done = w * r.progress;
+        bar = `
+          <rect x="${x1}" y="${y-10}" width="${done}" height="18" rx="3" fill="${statusColor.inprog}"/>
+          <rect x="${x1+done}" y="${y-10}" width="${w-done}" height="18" rx="3" fill="#CFCFCF"/>`;
+      } else {
+        bar = `<rect x="${x1}" y="${y-10}" width="${w}" height="18" rx="3" fill="${statusColor[r.status]||'#9A9A9A'}"/>`;
+      }
+      return `
+        <g>
+          <text x="10" y="${y+3}" font-size="11" fill="#1A1A1A" font-weight="500">${esc(labelText)}${criticalDot}</text>
+          ${bar}
+          ${noteText? `<text x="${x1+8}" y="${y+3}" font-size="10" fill="#fff" font-weight="500">${esc(noteText)}</text>` : ''}
+        </g>`;
+    }).join('');
+
+    // Critical path overlay — connect critical row midpoints
+    const critRows = s.rows.map((r,i)=>({r,i})).filter(o=>o.r.critical);
+    let critPath = '';
+    if(critRows.length>=2){
+      const pts = critRows.map(o=>{
+        const y = rowY0 + o.i*rowH;
+        const x = xFromDate(o.r.end);
+        return {x, y};
+      });
+      let d = `M${pts[0].x},${pts[0].y}`;
+      for(let k=1;k<pts.length;k++){
+        d += ` L${pts[k].x},${pts[k-1].y} L${pts[k].x},${pts[k].y}`;
+      }
+      critPath = `<path d="${d}" stroke="#E46962" stroke-width="1.5" fill="none" stroke-dasharray="3 2"/>`;
+    }
+
+    // Milestones as diamonds
+    const msSvg = s.milestones.map((m, mi)=>{
+      const x = xFromDate(m.date);
+      const y = chartBottom - 10;
+      return `<g transform="translate(${x},${y})">
+        <polygon points="0,-8 8,0 0,8 -8,0" fill="#F5A623"/>
+        <text x="0" y="22" text-anchor="middle" font-size="9" fill="#8A6D1A" font-weight="600">${esc(m.id)}</text>
+      </g>`;
+    }).join('');
+
+    const svgHeight = chartBottom + 50;
+    const svg = `
+      <svg viewBox="0 0 ${chartX+chartW+20} ${svgHeight}" style="width:100%;height:auto;min-width:780px" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Sans','IBM Plex Sans JP',sans-serif">
+        <g>${weekTicks.join('')}</g>
+        <g>${weekGrid.join('')}</g>
+        <g>
+          <line x1="${todayX}" y1="30" x2="${todayX}" y2="${chartBottom}" stroke="#E46962" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="${todayX+4}" y="42" font-size="10" fill="#E46962" font-weight="600">${esc(todayLbl)}</text>
+        </g>
+        ${rowsSvg}
+        ${critPath}
+        ${msSvg}
+      </svg>`;
+
+    // Legend
+    const lg = s.legend;
+    const legend = `
+      <div class="gantt-legend">
+        <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--done)"></span>${esc(pickLang(lg.done))}</div>
+        <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--inprog)"></span>${esc(pickLang(lg.inprog))}</div>
+        <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--todo)"></span>${esc(pickLang(lg.todo))}</div>
+        <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--blocked)"></span>${esc(pickLang(lg.blocked))}</div>
+        <div class="gantt-legend-item"><span class="gantt-swatch" style="background:var(--critical);border:1px dashed var(--critical)"></span>${esc(pickLang(lg.critical))}</div>
+        <div class="gantt-legend-item">◆ ${esc(pickLang(lg.milestone))}</div>
+      </div>`;
+
+    // Milestone list
+    const msRows = s.milestones.map((m, mi)=>`
+      <div class="ms-row">
+        <div class="ms-date">${esc(m.date)}</div>
+        <div class="ms-name">${esc(m.id)} · ${i18nSpan('schedule.milestones.'+mi+'.name')}</div>
+        <div class="ms-owner">${esc(pickLang(m.owner))}</div>
+        <div><span class="wbs-status status-${esc(m.status)}">${statusLabel(m.status)}</span></div>
+      </div>`).join('');
+
+    return `<section class="panel${currentTab===2?' active':''}" data-panel="2">
+      <div class="panel-title">${i18nSpan('schedule.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('schedule.desc')}</div>
+      ${legend}
+      <div class="gantt-wrap">${svg}</div>
+      <div class="section-h">${currentLang==='ja'?'マイルストーン詳細':'Milestone detail'}</div>
+      <div class="milestone-list">${msRows}</div>
+    </section>`;
+  }
+
+  // ---- TAB 4: RACI ----
+  function renderRaci(){
+    const r = data.raci;
+    const head = r.roles.map((role, ri)=>`<th>${nl2br(pickLang(role.name))}</th>`).join('');
+    const body = r.tasks.map((t, ti)=>{
+      const cells = r.roles.map(role=>{
+        const v = (t.assignments && t.assignments[role.id]) || '-';
+        const cls = v==='-' ? '' : ' raci-'+(v[0]||'').toLowerCase();
+        return `<td class="raci-cell${cls}">${esc(v==='-'?'—':v)}</td>`;
+      }).join('');
+      return `<tr><td class="task-cell">${i18nSpan('raci.tasks.'+ti+'.name')}</td>${cells}</tr>`;
+    }).join('');
+    const commsCards = r.comms.map((c, ci)=>`
+      <div class="card">
+        <div class="card-title">${i18nSpan('raci.comms.'+ci+'.name',{noPair:true})}</div>
+        <div class="card-body">${i18nSpan('raci.comms.'+ci+'.body',{multiline:true})}</div>
+      </div>`).join('');
+    return `<section class="panel${currentTab===3?' active':''}" data-panel="3">
+      <div class="panel-title">${i18nSpan('raci.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('raci.desc')}</div>
+      <table class="raci-table">
+        <thead><tr>
+          <th style="text-align:left;width:36%">${currentLang==='ja'?'作業項目':'Work Package'}</th>
+          ${head}
+        </tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+      <div class="section-h">${i18nSpan('raci.commsTitle',{noPair:true})}</div>
+      <div class="grid-2">${commsCards}</div>
+    </section>`;
+  }
+
+  // ---- TAB 5: Risk ----
+  function renderRisk(){
+    const r = data.risks;
+    const pColor = { H:'var(--risk-h)', M:'var(--risk-m)', L:'var(--risk-l)' };
+    const rows = r.items.map((it, i)=>`
+      <tr>
+        <td>${esc(it.id)}</td>
+        <td>${i18nSpan('risks.items.'+i+'.risk')}</td>
+        <td><span class="risk-dot" style="background:${pColor[it.p]||'var(--risk-l)'}"></span>${esc(it.p)}</td>
+        <td><span class="risk-dot" style="background:${pColor[it.i]||'var(--risk-l)'}"></span>${esc(it.i)}</td>
+        <td><span class="strat-pill strat-${esc(it.strategy)}">${i18nSpan('risks.items.'+i+'.strategyLabel',{noPair:true})}</span></td>
+        <td>${i18nSpan('risks.items.'+i+'.response',{multiline:true})}</td>
+      </tr>`).join('');
+
+    // Heatmap
+    function cellChips(pLetter, iLetter){
+      const hits = r.items.filter(it=>it.p===pLetter && it.i===iLetter);
+      return hits.map(h=>`<span class="chip">${esc(h.id)}</span>`).join('');
+    }
+    const heatClass = { 'H-L':'heat-hl','H-M':'heat-hm','H-H':'heat-hh',
+                        'M-L':'heat-ml','M-M':'heat-mm','M-H':'heat-mh',
+                        'L-L':'heat-ll','L-M':'heat-lm','L-H':'heat-lh' };
+    const heatHtml = `
+      <div class="risk-heatmap">
+        <div class="heat-head"></div>
+        <div class="heat-head">Low Impact</div>
+        <div class="heat-head">Med Impact</div>
+        <div class="heat-head">High Impact</div>
+
+        <div class="heat-head">High P</div>
+        <div class="heat-cell ${heatClass['H-L']}">${cellChips('H','L')}</div>
+        <div class="heat-cell ${heatClass['H-M']}">${cellChips('H','M')}</div>
+        <div class="heat-cell ${heatClass['H-H']}">${cellChips('H','H')}</div>
+
+        <div class="heat-head">Med P</div>
+        <div class="heat-cell ${heatClass['M-L']}">${cellChips('M','L')}</div>
+        <div class="heat-cell ${heatClass['M-M']}">${cellChips('M','M')}</div>
+        <div class="heat-cell ${heatClass['M-H']}">${cellChips('M','H')}</div>
+
+        <div class="heat-head">Low P</div>
+        <div class="heat-cell ${heatClass['L-L']}">${cellChips('L','L')}</div>
+        <div class="heat-cell ${heatClass['L-M']}">${cellChips('L','M')}</div>
+        <div class="heat-cell ${heatClass['L-H']}">${cellChips('L','H')}</div>
+      </div>`;
+
+    return `<section class="panel${currentTab===4?' active':''}" data-panel="4">
+      <div class="panel-title">${i18nSpan('risks.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('risks.desc')}</div>
+      <table class="risk-table">
+        <thead><tr>
+          <th style="width:6%">#</th>
+          <th style="width:26%">${currentLang==='ja'?'リスク事象':'Risk Event'}</th>
+          <th style="width:8%">${currentLang==='ja'?'確率':'Prob'}</th>
+          <th style="width:8%">${currentLang==='ja'?'影響':'Impact'}</th>
+          <th style="width:12%">${currentLang==='ja'?'戦略':'Strategy'}</th>
+          <th>${currentLang==='ja'?'対応内容 / トリガー':'Response / Trigger'}</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="section-h">${i18nSpan('risks.heatmapTitle',{noPair:true})}</div>
+      ${heatHtml}
+    </section>`;
+  }
+
+  // ---- TAB 6: Dashboard ----
+  function renderDashboard(){
+    const d = data.dashboard;
+    const kpis = d.kpis.map((k, i)=>{
+      const showBar = k.unit==='%';
+      return `<div class="kpi-card">
+        <div class="kpi-label">${i18nSpan('dashboard.kpis.'+i+'.label',{noPair:true})}</div>
+        <div class="kpi-value">${esc(k.value)}${esc(k.unit)}</div>
+        <div class="kpi-sub">${i18nSpan('dashboard.kpis.'+i+'.sub',{noPair:true})}</div>
+        ${showBar? `<div class="progress-track"><div class="progress-fill" style="width:${esc(k.value)}%"></div></div>` : ''}
+      </div>`;
+    }).join('');
+
+    // Burndown SVG
+    const bd = d.burndown;
+    const bW = 400, bH = 220, padL=40, padR=10, padT=30, padB=40;
+    const maxY = Math.max(...bd.map(p=>Math.max(p.planned||0, p.actual||0, p.forecast||0)));
+    const msStart = Date.parse(bd[0].date);
+    const msEnd   = Date.parse(bd[bd.length-1].date);
+    function bx(date){ return padL + (Date.parse(date)-msStart)/(msEnd-msStart) * (bW-padL-padR); }
+    function by(v){ return padT + (1 - (v/maxY)) * (bH-padT-padB); }
+
+    const plannedPts = bd.map(p=>`${bx(p.date)},${by(p.planned)}`).join(' ');
+    const actualBd   = bd.filter(p=>p.actual!==null && p.actual!==undefined);
+    const actualPts  = actualBd.map(p=>`${bx(p.date)},${by(p.actual)}`).join(' ');
+    const forecastBd = bd.filter(p=>p.forecast!==undefined && p.forecast!==null);
+    const joinActualToForecast = actualBd.length && forecastBd.length
+      ? `${bx(actualBd[actualBd.length-1].date)},${by(actualBd[actualBd.length-1].actual)} ${forecastBd.map(p=>`${bx(p.date)},${by(p.forecast)}`).join(' ')}`
+      : '';
+
+    // Y axis ticks (0, mid, max)
+    const yTicks = [0, Math.round(maxY/2), maxY];
+    const yTickLabels = yTicks.map(v=>`<text x="${padL-8}" y="${by(v)+3}" font-size="9" fill="#9A9A9A" text-anchor="end">${v}</text>`).join('');
+    const xTickLabels = bd.map(p=>{
+      const lbl = p.date.slice(5).replace('-','/');
+      return `<text x="${bx(p.date)}" y="${bH-padB+14}" font-size="9" fill="#9A9A9A" text-anchor="middle">${lbl}</text>`;
+    }).join('');
+
+    const lastActual = actualBd[actualBd.length-1];
+    const lastActualLabel = lastActual ? `<circle cx="${bx(lastActual.date)}" cy="${by(lastActual.actual)}" r="4" fill="#4A90D9"/>
+        <text x="${bx(lastActual.date)+8}" y="${by(lastActual.actual)-4}" font-size="10" fill="#4A90D9" font-weight="600">${lastActual.actual} left</text>` : '';
+
+    const burndownSvg = `
+      <svg viewBox="0 0 ${bW} ${bH}" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="#E8E8E8" stroke-width="0.5">
+          <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${bH-padB}"/>
+          <line x1="${padL}" y1="${bH-padB}" x2="${bW-padR}" y2="${bH-padB}"/>
+        </g>
+        ${yTickLabels}
+        ${xTickLabels}
+        <polyline points="${plannedPts}" fill="none" stroke="#9A9A9A" stroke-dasharray="4 3" stroke-width="1"/>
+        <text x="${bW-padR-40}" y="${by(bd[bd.length-2].planned||0)-8}" font-size="9" fill="#9A9A9A">Ideal</text>
+        ${actualPts ? `<polyline points="${actualPts}" fill="none" stroke="#4A90D9" stroke-width="2"/>` : ''}
+        ${lastActualLabel}
+        ${joinActualToForecast ? `<polyline points="${joinActualToForecast}" fill="none" stroke="#4A90D9" stroke-width="2" stroke-dasharray="3 3"/>` : ''}
+        ${forecastBd.length ? `<text x="${bx(forecastBd[0].date)+4}" y="${by(forecastBd[0].forecast)-6}" font-size="9" fill="#4A90D9">Forecast</text>` : ''}
+      </svg>`;
+
+    const signalHtml = d.signals.map((sg, si)=>{
+      const badgeClass = sg.type==='blocked'?'badge-stop':(sg.type==='risk'?'badge-warn':'badge-ok');
+      return `<div class="signal-row ${esc(sg.type)}">
+        <span class="badge ${badgeClass}">${esc(pickLang(sg.badge))}</span>
+        <div><strong>${i18nSpan('dashboard.signals.'+si+'.title',{noPair:true})}</strong><br><span style="color:var(--text-muted)">${i18nSpan('dashboard.signals.'+si+'.body',{multiline:true})}</span></div>
+      </div>`;
+    }).join('');
+
+    const actionsHtml = d.actions.map((a, ai)=>`
+      <div class="card">
+        <div class="card-title">${ai+1}. ${i18nSpan('dashboard.actions.'+ai+'.title',{noPair:true})}</div>
+        <div class="card-body">${i18nSpan('dashboard.actions.'+ai+'.body',{multiline:true})}</div>
+      </div>`).join('');
+
+    return `<section class="panel${currentTab===5?' active':''}" data-panel="5">
+      <div class="panel-title">${i18nSpan('dashboard.title',{noPair:true})}</div>
+      <div class="panel-desc">${i18nSpan('dashboard.desc')}</div>
+      <div class="grid-4" style="margin-bottom:20px">${kpis}</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">${currentLang==='ja'?'バーンダウン':'Burndown'}</div>
+          ${burndownSvg}
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">${i18nSpan('dashboard.burndownNote')}</div>
+        </div>
+        <div class="card">
+          <div class="card-title">${i18nSpan('dashboard.signalsTitle',{noPair:true})}</div>
+          <div style="margin-top:8px">${signalHtml}</div>
+        </div>
+      </div>
+      <div class="section-h" style="margin-top:24px">${i18nSpan('dashboard.actionsTitle',{noPair:true})}</div>
+      <div class="grid-3">${actionsHtml}</div>
+    </section>`;
+  }
+
+  function renderFooter(){
+    return `<footer>
+      <div>${i18nSpan('footer.left')}</div>
+      <div>${i18nSpan('footer.right',{noPair:true})}</div>
+    </footer>`;
+  }
+
+  // ---------- Tab / Lang ----------
+  function activateTab(idx){
+    currentTab = idx;
+    document.querySelectorAll('.tab-btn').forEach(t=>t.classList.toggle('active', t.dataset.tab===String(idx)));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===String(idx)));
+  }
+  function setLang(lang){
+    currentLang = lang;
+    document.body.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    document.querySelectorAll('[data-set-lang]').forEach(b=>b.classList.toggle('active', b.dataset.setLang===lang));
+    try{ localStorage.setItem(LS_KEY_LANG, lang); }catch(_){}
+    render();
+  }
+
+  // ---------- Edit mode ----------
+  function setEditMode(on){
+    editMode = !!on;
+    document.body.classList.toggle('edit-mode', editMode);
+    const toggle = document.getElementById('edit-toggle');
+    toggle.classList.toggle('edit-active', editMode);
+    toggle.textContent = editMode ? '閲覧' : '編集';
+    document.querySelectorAll('.edit-only').forEach(el=>{ el.style.display = editMode ? 'flex' : 'none'; });
+    document.querySelectorAll('.editable').forEach(el=>{
+      if(editMode){ el.setAttribute('contenteditable','true'); }
+      else { el.removeAttribute('contenteditable'); }
+    });
+    updateStatusChip();
+  }
+
+  function attachDynamicListeners(){
+    document.querySelectorAll('.tab-btn').forEach(t=>{
+      t.addEventListener('click', e=>{
+        if(editMode && e.target.closest('.editable')) return;
+        activateTab(Number(t.dataset.tab));
+      });
+    });
+    document.querySelectorAll('.editable').forEach(el=>{
+      el.addEventListener('focus', function(){
+        if(!editMode) return;
+        this.dataset.origText = extractTextOnly(this);
+      });
+      el.addEventListener('blur', function(ev){
+        if(!editMode) return;
+        const path = this.dataset.i18nPath;
+        if(!path) return;
+        const newText = extractTextOnly(this);
+        if(newText === this.dataset.origText) return;
+        const cur = getPairValue(path);
+        const sourceLang = currentLang;
+        const targetLang = sourceLang==='ja' ? 'en' : 'ja';
+        if(sourceLang==='ja'){ setPairValue(path, newText, cur.en); }
+        else { setPairValue(path, cur.ja, newText); }
+        saveData();
+        refreshEditable(this, path);
+        // v4: trigger auto-translate via proxy
+        if(translateEnabled && newText && newText.trim().length>0 && isProxyConfigured()){
+          const targetExisting = (sourceLang==='ja') ? cur.en : cur.ja;
+          if(!targetExisting || !targetExisting.trim()){
+            // target empty: translate directly
+            doTranslateField(path, newText, sourceLang, targetLang, this);
+          } else {
+            // target exists: confirm popover
+            showOverwriteConfirm(this, path, newText, sourceLang, targetLang);
+          }
+        }
+      });
+      el.addEventListener('keydown', function(e){
+        if(e.key==='Enter' && !e.shiftKey && !isMultilineField(this)){
+          e.preventDefault(); this.blur();
+        }
+        if(e.key==='Escape'){
+          this.textContent = this.dataset.origText||'';
+          this.blur();
+        }
+      });
+    });
+    document.querySelectorAll('[data-pair-btn]').forEach(btn=>{
+      btn.addEventListener('mousedown', e=>{ e.preventDefault(); });
+      btn.addEventListener('click', e=>{
+        e.preventDefault(); e.stopPropagation();
+        openPairModal(btn.dataset.pairBtn);
+      });
+    });
+  }
+
+  function isMultilineField(el){
+    return (el.dataset.field||'').indexOf('multi')>=0
+      || !!(el.closest('td.val, .card-body, .panel-desc'));
+  }
+
+  function extractTextOnly(el){
+    const clone = el.cloneNode(true);
+    clone.querySelectorAll('.pair-edit-btn,.lang-warn,.edit-marker,.tl-spinner,.tl-flash,.tl-tooltip').forEach(n=>n.remove());
+    clone.querySelectorAll('br').forEach(br=>br.replaceWith(document.createTextNode('\n')));
+    return clone.textContent.replace(/\u00a0/g,' ').trim();
+  }
+
+  function refreshEditable(el, path){
+    if(!el.querySelector('.edit-marker')){
+      const m = document.createElement('span');
+      m.className = 'edit-marker';
+      el.appendChild(m);
+    }
+    el.setAttribute('title', '最終編集: '+editTimes[path]);
+    const val = getPairValue(path);
+    const missing = !val.ja || !val.en;
+    el.classList.toggle('missing-lang', missing);
+  }
+
+  // ---------- Modal ----------
+  let modalPath = null;
+  function openPairModal(path){
+    modalPath = path;
+    const val = getPairValue(path);
+    document.getElementById('modal-ja').value = val.ja || '';
+    document.getElementById('modal-en').value = val.en || '';
+    document.getElementById('modal-sub-text').textContent = path;
+    const backdrop = document.getElementById('modal');
+    backdrop.classList.add('visible');
+    backdrop.setAttribute('aria-hidden','false');
+    setTimeout(()=>document.getElementById('modal-ja').focus(), 50);
+  }
+  function closeModal(){
+    document.getElementById('modal').classList.remove('visible');
+    document.getElementById('modal').setAttribute('aria-hidden','true');
+    modalPath = null;
+  }
+  function saveModal(){
+    if(!modalPath) return;
+    const ja = document.getElementById('modal-ja').value;
+    const en = document.getElementById('modal-en').value;
+    setPairValue(modalPath, ja, en);
+    saveData();
+    closeModal();
+    render();
+  }
+
+  // ---------- Status chip ----------
+  function updateStatusChip(){
+    const chip = document.getElementById('status-chip');
+    const count = Object.keys(editTimes).length;
+    if(count > 0){
+      chip.classList.add('visible');
+      document.getElementById('status-text').textContent = `編集済み ${count}件 · localStorage保存`;
+    } else {
+      chip.classList.remove('visible');
+    }
+  }
+
+  // ---------- Export ----------
+  function exportHtml(){
+    const html = document.documentElement.cloneNode(true);
+    const json = html.querySelector('#pmp-data');
+    if(json) json.textContent = JSON.stringify(data, null, 2);
+    html.querySelector('body').classList.remove('edit-mode');
+    html.querySelectorAll('[contenteditable]').forEach(n=>n.removeAttribute('contenteditable'));
+    const appEl = html.querySelector('#app');
+    if(appEl) appEl.innerHTML = '';
+    const out = '<!DOCTYPE html>\n' + html.outerHTML;
+    const blob = new Blob([out], {type:'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+    const slug = (data.meta && data.meta.topicSlug) || 'project-plan';
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${slug}_project-plan_v3_edited_${ts}.html`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+  }
+
+  function resetEdits(){
+    if(!confirm('全ての編集をリセットし、初期JSONに戻します。よろしいですか？')) return;
+    try{
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(LS_KEY_TIMES + '-' + topicSlug);
+    }catch(_){}
+    data = deepClone(initialData);
+    editTimes = {};
+    render();
+  }
+
+  // ---------- v4: Translation (proxy-backed) ----------
+  let translateEnabled = (function(){
+    try{ return localStorage.getItem(LS_KEY_TL_ENABLED)==='1'; }catch(_){ return false; }
+  })();
+  let translationCache = (function(){
+    try{
+      const raw = localStorage.getItem(LS_KEY_TL_CACHE + '-' + topicSlug);
+      if(raw) return JSON.parse(raw);
+    }catch(_){}
+    return {};
+  })();
+
+  function saveTranslationCache(){
+    try{ localStorage.setItem(LS_KEY_TL_CACHE + '-' + topicSlug, JSON.stringify(translationCache)); }catch(_){}
+  }
+
+  function cacheKey(sourceLang, targetLang, text){
+    return sourceLang + '|' + targetLang + '|' + text;
+  }
+
+  async function callAnthropicTranslate(text, sourceLang, targetLang){
+    if(!isProxyConfigured()) throw new Error('NO_PROXY');
+    const ck = cacheKey(sourceLang, targetLang, text);
+    if(translationCache[ck] && translationCache[ck].targetText){
+      return { text: translationCache[ck].targetText, cached: true };
+    }
+    const srcName = sourceLang==='ja' ? 'Japanese' : 'English';
+    const tgtName = targetLang==='ja' ? 'Japanese' : 'English';
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), API_TIMEOUT_MS);
+    let resp;
+    try{
+      resp = await fetch(PROXY_ENDPOINT.replace(/\/$/, '') + '/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sourceText: text,
+          sourceLang: srcName,
+          targetLang: tgtName,
+          context: TRANSLATE_CONTEXT
+        }),
+        signal: ctrl.signal
+      });
+    } catch(e){
+      clearTimeout(timer);
+      if(e.name==='AbortError') throw new Error('TIMEOUT');
+      throw new Error('NETWORK');
+    }
+    clearTimeout(timer);
+    if(resp.status===403) throw new Error('FORBIDDEN');
+    if(resp.status===429) throw new Error('RATE_LIMIT');
+    if(resp.status>=500) throw new Error('SERVER');
+    if(!resp.ok){
+      let msg = 'HTTP_' + resp.status;
+      try{ const j = await resp.json(); if(j && j.error) msg += ': '+j.error; }catch(_){}
+      throw new Error(msg);
+    }
+    const data = await resp.json();
+    const out = data && typeof data.translation==='string' ? data.translation : '';
+    if(!out) throw new Error('EMPTY_RESPONSE');
+    const translated = String(out).trim();
+    translationCache[ck] = {
+      sourceLang, sourceText: text,
+      targetLang, targetText: translated,
+      timestamp: new Date().toISOString()
+    };
+    saveTranslationCache();
+    return { text: translated, cached: !!data.cached };
+  }
+
+  function findEditableEl(path){
+    return document.querySelector(`.editable[data-i18n-path="${CSS.escape(path)}"]`);
+  }
+
+  function setFieldLoading(el){
+    if(!el) return;
+    el.classList.remove('tl-ok','tl-err');
+    el.classList.add('tl-loading');
+    clearTooltip(el);
+  }
+  function setFieldSuccess(el){
+    if(!el) return;
+    el.classList.remove('tl-loading','tl-err');
+    el.classList.add('tl-ok');
+    setTimeout(()=>{ if(el && el.classList) el.classList.remove('tl-ok'); }, 700);
+  }
+  function setFieldError(el, msg){
+    if(!el) return;
+    el.classList.remove('tl-loading','tl-ok');
+    el.classList.add('tl-err');
+    showTooltip(el, msg);
+    setTimeout(()=>{ if(el && el.classList){ el.classList.remove('tl-err'); clearTooltip(el); } }, 5000);
+  }
+  function showTooltip(el, msg){
+    clearTooltip(el);
+    const t = document.createElement('span');
+    t.className = 'tl-tooltip';
+    t.textContent = msg;
+    el.appendChild(t);
+  }
+  function clearTooltip(el){
+    if(!el) return;
+    const t = el.querySelector('.tl-tooltip');
+    if(t) t.remove();
+  }
+
+  function errorMessage(code){
+    if(code==='NO_PROXY')     return 'プロキシ未設定です。README.md参照';
+    if(code==='FORBIDDEN')    return 'このドメインからは翻訳できません';
+    if(code==='RATE_LIMIT')   return 'レート制限。30秒後に再試行';
+    if(code==='SERVER')       return '翻訳サービスが利用できません';
+    if(code==='NETWORK')      return 'オフラインです';
+    if(code==='TIMEOUT')      return 'タイムアウト (15秒)';
+    if(code==='EMPTY_RESPONSE') return '翻訳結果が空';
+    return '翻訳失敗: ' + code;
+  }
+
+  async function doTranslateField(path, sourceText, sourceLang, targetLang, el){
+    if(!isProxyConfigured()){ openProxyModal(); return; }
+    if(!el) el = findEditableEl(path);
+    setFieldLoading(el);
+    try{
+      const res = await callAnthropicTranslate(sourceText, sourceLang, targetLang);
+      const cur = getPairValue(path);
+      if(targetLang==='en'){ setPairValue(path, cur.ja || sourceText, res.text); }
+      else { setPairValue(path, res.text, cur.en || sourceText); }
+      saveData();
+      setFieldSuccess(el);
+      // re-render to reflect new values / missing-lang flag
+      render();
+    } catch(e){
+      const code = e.message || 'UNKNOWN';
+      const msg = errorMessage(code);
+      setFieldError(el, msg);
+      if(code==='NO_PROXY'){
+        setTimeout(openProxyModal, 400);
+      }
+      console.warn('[v4 translate] failed', code, e);
+    }
+  }
+
+  function showOverwriteConfirm(el, path, newText, sourceLang, targetLang){
+    // close any existing
+    document.querySelectorAll('.tl-confirm').forEach(n=>n.remove());
+    const rect = el.getBoundingClientRect();
+    const pop = document.createElement('div');
+    pop.className = 'tl-confirm';
+    pop.style.left = Math.min(window.innerWidth-340, Math.max(8, rect.left)) + 'px';
+    pop.style.top  = (window.scrollY + rect.bottom + 6) + 'px';
+    const targetLabel = targetLang==='en' ? 'EN' : 'JA';
+    pop.innerHTML = `
+      <div class="tl-confirm-title">反対言語 (${targetLabel}) を上書き？</div>
+      <div class="tl-confirm-body">既に値があります。LLMで再翻訳し上書きしますか。</div>
+      <div class="tl-confirm-row">
+        <button type="button" class="btn" data-tl-confirm="no">そのまま</button>
+        <button type="button" class="btn btn-tl" data-tl-confirm="yes">翻訳</button>
+      </div>`;
+    document.body.appendChild(pop);
+    pop.querySelector('[data-tl-confirm="yes"]').addEventListener('click', ()=>{
+      pop.remove();
+      doTranslateField(path, newText, sourceLang, targetLang, el);
+    });
+    pop.querySelector('[data-tl-confirm="no"]').addEventListener('click', ()=>pop.remove());
+    setTimeout(()=>{
+      document.addEventListener('mousedown', function handler(e){
+        if(!pop.contains(e.target)){ pop.remove(); document.removeEventListener('mousedown', handler); }
+      });
+    }, 10);
+  }
+
+  // ---- Translate toggle ----
+  function updateTranslateToggleUI(){
+    const btn = document.getElementById('tl-toggle');
+    if(!btn) return;
+    btn.classList.toggle('tl-active', translateEnabled);
+  }
+  function setTranslateEnabled(on){
+    translateEnabled = !!on;
+    try{ localStorage.setItem(LS_KEY_TL_ENABLED, translateEnabled?'1':'0'); }catch(_){}
+    updateTranslateToggleUI();
+  }
+
+  // ---- Proxy-not-configured modal (v4) ----
+  function openProxyModal(){
+    const m = document.getElementById('proxy-modal');
+    m.classList.add('visible');
+    m.setAttribute('aria-hidden','false');
+  }
+  function closeProxyModal(){
+    const m = document.getElementById('proxy-modal');
+    m.classList.remove('visible');
+    m.setAttribute('aria-hidden','true');
+  }
+
+  // ---- Modal pair-translate buttons ----
+  async function modalTranslate(direction){
+    if(!isProxyConfigured()){ openProxyModal(); return; }
+    const jaBox = document.getElementById('modal-ja');
+    const enBox = document.getElementById('modal-en');
+    if(direction==='ja2en'){
+      const src = (jaBox.value||'').trim();
+      if(!src) return;
+      try{
+        const res = await callAnthropicTranslate(src, 'ja', 'en');
+        enBox.value = res.text;
+      }catch(e){ alert('翻訳失敗: ' + errorMessage(e.message)); }
+    } else {
+      const src = (enBox.value||'').trim();
+      if(!src) return;
+      try{
+        const res = await callAnthropicTranslate(src, 'en', 'ja');
+        jaBox.value = res.text;
+      }catch(e){ alert('翻訳失敗: ' + errorMessage(e.message)); }
+    }
+  }
+
+  // ---------- Static listeners ----------
+  document.querySelectorAll('[data-set-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.setLang)));
+  document.getElementById('edit-toggle').addEventListener('click', ()=>setEditMode(!editMode));
+  document.getElementById('btn-export').addEventListener('click', exportHtml);
+  document.getElementById('btn-reset').addEventListener('click', resetEdits);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal-save').addEventListener('click', saveModal);
+  document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+
+  // v4: translate toggle + proxy notice modal
+  document.getElementById('tl-toggle').addEventListener('click', ()=>{
+    const next = !translateEnabled;
+    setTranslateEnabled(next);
+    if(next && !isProxyConfigured()) openProxyModal();
+  });
+  document.getElementById('proxy-modal-close').addEventListener('click', closeProxyModal);
+  document.getElementById('proxy-modal-ok').addEventListener('click', closeProxyModal);
+  document.getElementById('proxy-modal').addEventListener('click', e=>{ if(e.target.id==='proxy-modal') closeProxyModal(); });
+  document.getElementById('modal-tl-ja2en').addEventListener('click', ()=>modalTranslate('ja2en'));
+  document.getElementById('modal-tl-en2ja').addEventListener('click', ()=>modalTranslate('en2ja'));
+  // One-time cleanup: legacy v3 API key in localStorage has no function in v4.
+  try{ localStorage.removeItem('anthropic-api-key'); }catch(_){}
+
+  document.addEventListener('keydown', e=>{
+    if(e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA' || (e.target.getAttribute && e.target.getAttribute('contenteditable')==='true')){
+      if(e.key==='Escape'){
+        const modal = document.getElementById('modal');
+        if(modal.classList.contains('visible')){ closeModal(); e.preventDefault(); }
+      }
+      if(e.key==='s' && (e.ctrlKey||e.metaKey)){
+        e.preventDefault(); exportHtml();
+      }
+      return;
+    }
+    const n = Number(e.key);
+    if(n>=1 && n<=6){ activateTab(n-1); return; }
+    if(e.key.toLowerCase()==='r'){ activateTab(0); return; }
+    if(e.key.toLowerCase()==='l'){ setLang(currentLang==='ja'?'en':'ja'); return; }
+    if(e.key.toLowerCase()==='e'){ setEditMode(!editMode); return; }
+    if(e.key.toLowerCase()==='t'){
+      const next = !translateEnabled;
+      setTranslateEnabled(next);
+      if(next && !isProxyConfigured()) openProxyModal();
+      return;
+    }
+    if(e.key==='s' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); exportHtml(); }
+  });
+
+  window.addEventListener('beforeprint', ()=>{ document.body.classList.remove('edit-mode'); });
+  window.addEventListener('afterprint',  ()=>{ if(editMode) document.body.classList.add('edit-mode'); });
+
+  // ---------- Init ----------
+  document.body.setAttribute('data-lang', currentLang);
+  document.querySelectorAll('[data-set-lang]').forEach(b=>b.classList.toggle('active', b.dataset.setLang===currentLang));
+  render();
+  updateTranslateToggleUI();
+})();
+</script>
+
+</body>
+</html>
